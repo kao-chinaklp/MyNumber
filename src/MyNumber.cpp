@@ -343,8 +343,8 @@ MyNumber MyNumber::operator*(MyNumber num){
         }
     }
     ui l1=len, l2=len;
-    while(ans[l1-1].real()==0)l1--;
-    while(ans[l2-1].imag()==0)l2--;
+    // while(ans[l1-1].real()==0)l1--;
+    // while(ans[l2-1].imag()==0)l2--;
     len=1<<max((int)ceil(log2(l1+l2)), 1);
     FFTInit(len);
     FFT(ans, len, 1);
@@ -364,7 +364,7 @@ void MyNumber::FFTInit(ui len){
 
 void MyNumber::FFT(vector<complex<double>>& arr, int n, int inv){
     for(ui i=0;i<n;i++)
-        if(i<rev[i])swap(arr[i], arr[rev[i]]);
+        if(rev[i]<n<rev[i])swap(arr[i], arr[rev[i]]);
     for(ui i=1;i<n;i<<=1){
         complex<double> wn(cos(2*pi/i), inv*sin(2*pi/i));
         for(ui j=0;j<n;j+=(i<<1)){
