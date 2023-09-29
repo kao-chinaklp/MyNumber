@@ -1,15 +1,19 @@
-#include "BaseNumber.h"
+#include "MyNumber.h"
 
 #include <iostream>
 
 using namespace std;
 
 int main(){
-    BaseNumber num;
+    MyNumber num1, num2;
     string in;
-    while(cin>>in){
-        num=in;
-        cout<<(num<=0)<<endl;
+    while(true){
+        cin>>in;
+        num1=in;
+        cin>>in;
+        num2=in;
+        auto res=num1*num2;
+        cout<<res.OutPut()<<endl;
     }
     return 0;
 }
