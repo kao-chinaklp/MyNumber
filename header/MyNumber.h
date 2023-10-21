@@ -3,9 +3,11 @@
 #define ui unsigned int
 #define ll long long
 
+#include "Vector.h"
+#include "Complex.h"
+
 #include <cmath>
 #include <string>
-#include <vector>
 #include <complex>
 
 const ui Lim=int(1e9);
@@ -27,9 +29,9 @@ class MyNumber{
         void SetSign(bool Sign);
         ui GetSize()const;
         void SetSize(ui new_size);
-        std::vector<ui> GetNumber();
+        Vector<ui> GetNumber();
         void RemoveLeadingZero();
-        std::string OutPut();
+        std::string Str();
 
     public:
         ui& operator[](ui idx);
@@ -62,12 +64,13 @@ class MyNumber{
 
     private:
         bool Sign; // true == negative  false == positive
-        std::vector<ui> Number;
-        std::vector<ui> rev;
-        void FFTInit(ui len);
-        void FFT(std::vector<std::complex<double> >& arr, int n, int inv);
+        Vector<ui> Number;
+        Vector<ui> rev;
+        void FFTInit(ui len, ui size);
+        void FFT(Vector<Complex >& arr, int n, int inv);
 };
 
 void swap(MyNumber& x, MyNumber& y);
+void swap(Complex& x, Complex& y);
 
 #endif

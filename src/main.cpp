@@ -13,7 +13,7 @@ int main(){
         cin>>in;
         num2=in;
         auto res=num1*num2;
-        cout<<res.OutPut()<<endl;
+        cout<<res.Str()<<endl;
     }
     return 0;
 }

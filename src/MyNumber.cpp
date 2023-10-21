@@ -2,16 +2,16 @@
 
 #include <algorithm>
 
-using std::string, std::vector, std::complex;
+using std::string;
 using std::ceil, std::reverse, std::max;
 
 MyNumber::MyNumber(ll num){
     this->jump=false;
     if(num<0)this->Sign=true,num=-num;
     else this->Sign=false;
-    this->Number.clear();
+    this->Number.Clear();
     while(num){
-        this->Number.push_back(num%Lim);
+        this->Number.PushBack(num%Lim);
         num/=Lim;
     }
 }
@@ -20,42 +20,32 @@ MyNumber::MyNumber(string num){
     this->jump=false;
     if(num[0]=='-')this->Sign=true,num.erase(num.begin());
     else this->Sign=false;
-    this->Number.clear();
-    ui tmp;
-    string cache;
-    while(!num.empty()){
-        auto iter=num.begin();
-        auto _end=num.end();
-        cache="",tmp=0;
-        while(iter!=_end){
-            tmp=tmp*10+*iter-48;
-            ++iter;
-            if(tmp<Lim)continue;
-            cache.push_back(tmp%Lim);
-            tmp/=Lim;
-        }
-        this->Number.push_back(tmp);
-        num=cache;
+    this->Number.Clear();
+    string tmp;
+    for(int i=0, len=num.size();i<len;i+=9){
+        tmp=num.substr(i,std::min(9, len-i));
+        this->Number.PushBack(atoi(tmp.c_str()));
     }
+    reverse(this->Number.Begin(), this->Number.End());
 }
 
 MyNumber::MyNumber(MyNumber& num){
     this->jump=false;
     this->Sign=num.GetSign();
-    this->Number=vector<ui>(num.GetNumber());
+    this->Number=Vector<ui>(num.GetNumber());
 }
 
 MyNumber::~MyNumber(){
-    this->Number.clear();
-    this->Number.shrink_to_fit();
+    this->Number.Clear();
+    this->Number.ShrinkToFit();
 }
 
 MyNumber& MyNumber::operator=(ll num){
     if(num<0)this->Sign=true,num=-num;
     else this->Sign=false;
-    this->Number.clear();
+    this->Number.Clear();
     while(num){
-        this->Number.push_back(num%Lim);
+        this->Number.PushBack(num%Lim);
         num/=Lim;
     }
     return *this;
@@ -64,24 +54,24 @@ MyNumber& MyNumber::operator=(ll num){
 MyNumber& MyNumber::operator=(string num){
     if(num[0]=='-')this->Sign=true,num.erase(num.begin());
     else this->Sign=false;
-    this->Number.clear();
+    this->Number.Clear();
     int tmp,cnt=num.size()-1,bit;
     const ui _size=num.size();
     for(ui i=0,len=ceil(_size/9.0);i<len;i++){
-        tmp=0,bit=1;
+        tmp=0, bit=1;
         while(bit!=Lim&&cnt>=0){
             tmp+=(num[cnt]-48)*bit;
             --cnt;
             bit*=10;
         }
-        this->Number.push_back(tmp);
+        this->Number.PushBack(tmp);
     }
     return *this;
 }
 
 MyNumber& MyNumber::operator=(MyNumber& num){
     this->Sign=num.GetSign();
-    this->Number=vector<ui>(num.GetNumber());
+    this->Number=Vector<ui>(num.GetNumber());
     return *this;
 }
 
@@ -94,23 +84,23 @@ void MyNumber::SetSign(bool Sign){
 }
 
 ui MyNumber::GetSize()const{
-    return this->Number.size();
+    return this->Number.Size();
 }
 
 void MyNumber::SetSize(ui new_size){
-    this->Number.resize(new_size, 0);
+    this->Number.Resize(new_size, 0);
 }
 
-vector<ui> MyNumber::GetNumber(){
+Vector<ui> MyNumber::GetNumber(){
     return this->Number;
 }
 
 void MyNumber::RemoveLeadingZero(){
-    while(this->GetSize()>1&&this->Number.back()==0)
-        this->Number.pop_back();
+    while(this->GetSize()>1&&this->Number.Back()==0)
+        this->Number.PopBack();
 }
 
-string MyNumber::OutPut(){
+string MyNumber::Str(){
     string out="";
     for(int p=0,len=this->GetSize();p<len;p++){
         ui tmp=this->Number[p];
@@ -135,17 +125,17 @@ MyNumber MyNumber::operator++(){
         this->jump=true;
         return --(*this);
     }
-    auto iter=this->Number.begin();
-    auto _end=this->Number.end();
+    auto iter=this->Number.Begin();
+    auto _End=this->Number.End();
     ++(*iter);
-    while((++iter)!=_end){
+    while((++iter)!=_End){
         if(*(iter-1)!=Lim)break;
         ++(*iter);
         *(iter-1)=0;
     }
-    if(this->GetSize()>1&&iter==_end||*(iter-1)==Lim){
+    if(this->GetSize()>1&&iter==_End||*(iter-1)==Lim){
         (*iter)=0;
-        this->Number.push_back(1);
+        this->Number.PushBack(1);
     }
     this->jump=false;
     return *this;
@@ -169,10 +159,10 @@ MyNumber MyNumber::operator--(){
             return ++(*this);
         }
     }
-    auto iter=this->Number.begin();
-    auto _end=this->Number.end();
+    auto iter=this->Number.Begin();
+    auto _End=this->Number.End();
     --(*iter);
-    while((++iter)!=_end){
+    while((++iter)!=_End){
         if(*(iter-1)<Lim)break;
         --(*iter);
         *(iter-1)=Lim-1;
@@ -300,7 +290,7 @@ MyNumber MyNumber::operator-(MyNumber num){
     if(num.GetSign())return tmp+(-num);
     else if(tmp.GetSign())return -((-tmp)+num);
     if(tmp<num){
-        swap(tmp,num);
+        swap(tmp, num);
         ans.SetSign(true);
     }
     ui new_size=max(tmp.GetSize(),num.GetSize());
@@ -324,53 +314,65 @@ MyNumber MyNumber::operator*(ll num){
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
-    string str="";
-    complex<double> t;
-    MyNumber tmp(*this);
-    vector<complex<double> > ans;
-    ui new_size=max(tmp.GetSize(),num.GetSize()),len=0;
-    tmp.SetSize(new_size);
-    num.SetSize(new_size);
-    for(ui i=0;i<new_size;i++){
-        ui t1=tmp[i], t2=num[i], cnt=0;
-        while(++cnt<=9){
-            if(i==new_size-1&&!t1&&!t2)break;
-            t.real(t1%10);
-            t.imag(t2%10);
-            ans.push_back(t);
-            t1/=10, t2/=10;
-            len++;
+    Vector<Complex> ans, num1, num2;
+    Vector<ui> res;
+    string str=this->Str();
+    int len1=str.size();
+    for(auto i=str.rbegin();i!=str.rend();i++)
+        num1.PushBack(Complex(double(*i-48)));
+        /////////////////////////bug
+    for(auto i=0;i!=5;i++)
+        printf("%s ",num1[i].Str().c_str());
+    str=num.Str();
+    int len2=str.size();
+    for(auto i=str.rbegin();i!=str.rend();i++)
+        num2.PushBack(Complex(double(*i-48)));
+    int len=1, l=0;
+    while(len<len1+len2)len<<=1,l++;
+    ans.Resize(len);
+    res.Resize(len);
+    num1.Resize(len), num2.Resize(len);
+    FFTInit(len, l);
+    FFT(num1, len, 1);
+    FFT(num2, len, 1);
+    for(int i=0;i<len;i++)
+        ans[i]=num1[i]*num2[i];
+    FFT(ans, len, -1);
+    for(int i=0;i<len;i++){
+        res[i]+=ans[i].Real()/len+eps;
+        if(i<len-1){
+            res[i+1]+=res[i]/10;
+            res[i]%=10;
         }
     }
-    ui l1=len, l2=len;
-    // while(ans[l1-1].real()==0)l1--;
-    // while(ans[l2-1].imag()==0)l2--;
-    len=1<<max((int)ceil(log2(l1+l2)), 1);
-    FFTInit(len);
-    FFT(ans, len, 1);
-    for(int i=0;i<len;i++)
-        ans[i]*=ans[i];
-    FFT(ans, len, -1);
-    for(int i=0;i<new_size;i++)
-        str.push_back(ans[i].imag()/2/len+eps+48);
+    if(res.Back()>9){
+        res.PushBack(res.Back()/10);
+        *(res.End()-2)%=10;
+        len++;
+    }
+    while(res[len-1]==0&&len>0)len--;
+    while(len>0&&res[len-1]==0)len--;
+    str.clear();
+    for(int i=len-1;i>=0;i--)
+        str.push_back(res[i]+48);
     return MyNumber(str);
 }
 
-void MyNumber::FFTInit(ui len){
-    rev.resize(len);
+void MyNumber::FFTInit(ui len, ui Size){
+    rev.Resize(len);
     for(ui i=0;i<len;i++)
-        rev[i]=(rev[i>>1]>>1)|((i&1)<<(max((int)ceil(log2(len)), 1)-1));
+        rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
 }
 
-void MyNumber::FFT(vector<complex<double>>& arr, int n, int inv){
+void MyNumber::FFT(Vector<Complex>& arr, int n, int inv){
     for(ui i=0;i<n;i++)
-        if(rev[i]<n<rev[i])swap(arr[i], arr[rev[i]]);
+        if(i<rev[i])swap(arr[i], arr[rev[i]]);
     for(ui i=1;i<n;i<<=1){
-        complex<double> wn(cos(2*pi/i), inv*sin(2*pi/i));
+        Complex wn(cos(pi/i), inv*sin(pi/i));
         for(ui j=0;j<n;j+=(i<<1)){
-            complex<double> w0(1,0);
+            Complex w0(1,0);
             for(ui k=0;k<i;k++, w0*=wn){
-                complex<double> x=arr[j+k], y=w0*arr[i+j+k];
+                Complex x=arr[j+k], y=w0*arr[i+j+k];
                 arr[j+k]=x+y;
                 arr[i+j+k]=x-y;
             }
@@ -380,6 +382,12 @@ void MyNumber::FFT(vector<complex<double>>& arr, int n, int inv){
 
 void swap(MyNumber& x, MyNumber& y){
     MyNumber tmp=x;
+    x=y;
+    y=tmp;
+}
+
+void swap(Complex& x, Complex& y){
+    Complex tmp=x;
     x=y;
     y=tmp;
 }
