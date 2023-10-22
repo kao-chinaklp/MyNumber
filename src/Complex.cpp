@@ -99,6 +99,10 @@ inline Complex operator*(double num1, Complex num2){
     return num2+num1;
 }
 
+inline Complex operator-(Complex& num){
+    return Complex(-num.Real(), -num.Imag());
+}
+
 inline Complex operator-(Complex num){
     return Complex(-num.Real(), -num.Imag());
 }

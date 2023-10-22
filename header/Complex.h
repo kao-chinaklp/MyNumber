@@ -35,12 +35,12 @@ class Complex{
         double real;
 };
 
-inline Complex operator+(double num1, Complex num2);
-inline Complex operator-(double num1, Complex num2);
-inline Complex operator*(double num1, Complex num2);
-inline Complex operator-(Complex& num);
+Complex operator+(double num1, Complex num2);
+Complex operator-(double num1, Complex num2);
+Complex operator*(double num1, Complex num2);
+Complex operator-(Complex& num);
 
-inline bool operator==(double num1, Complex num2);
-inline bool operator!=(double num1, Complex num2);
+bool operator==(double num1, Complex num2);
+bool operator!=(double num1, Complex num2);
 
 #endif

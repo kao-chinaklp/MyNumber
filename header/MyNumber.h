@@ -7,8 +7,6 @@
 #include "Complex.h"
 
 #include <cmath>
-#include <string>
-#include <complex>
 
 const ui Lim=int(1e9);
 const double eps=0.49, pi=acos(-1.0);
@@ -61,6 +59,17 @@ class MyNumber{
         MyNumber operator-(MyNumber num);
         MyNumber operator*(ll num);
         MyNumber operator*(MyNumber num);
+        MyNumber operator/(ll num);
+        MyNumber operator/(MyNumber num);
+
+        MyNumber operator+=(ll num);
+        MyNumber operator+=(MyNumber num);
+        MyNumber operator-=(ll num);
+        MyNumber operator-=(MyNumber num);
+        MyNumber operator*=(ll num);
+        MyNumber operator*=(MyNumber num);
+        MyNumber operator/=(ll num);
+        MyNumber operator/=(MyNumber num);
 
     private:
         bool Sign; // true == negative  false == positive
@@ -69,6 +78,15 @@ class MyNumber{
         void FFTInit(ui len, ui size);
         void FFT(Vector<Complex >& arr, int n, int inv);
 };
+
+MyNumber operator+(ll num1, MyNumber num2);
+MyNumber operator-(ll num1, MyNumber num2);
+MyNumber operator*(ll num1, MyNumber num2);
+MyNumber operator/(ll num1, MyNumber num2);
+MyNumber operator+=(ll& num1, MyNumber num2);
+MyNumber operator-=(ll& num1, MyNumber num2);
+MyNumber operator*=(ll& num1, MyNumber num2);
+MyNumber operator/=(ll& num1, MyNumber num2);
 
 void swap(MyNumber& x, MyNumber& y);
 void swap(Complex& x, Complex& y);

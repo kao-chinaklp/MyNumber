@@ -1,7 +1,5 @@
 #include "MyNumber.h"
 
-#include <algorithm>
-
 using std::string;
 using std::ceil, std::reverse, std::max;
 
@@ -357,6 +355,17 @@ MyNumber MyNumber::operator*(MyNumber num){
     return MyNumber((flag?"":"-")+str);
 }
 
+MyNumber MyNumber::operator/(ll num){
+}
+
+MyNumber MyNumber::operator/(MyNumber num){
+    MyNumber ans(*this);
+    ui times=max(10, int(ceil(log2(num.GetSize()))));/// to do
+    for(int i=1;i<=times;i++)
+        ans*=2-num*ans;
+    return ans;
+}
+
 void MyNumber::FFTInit(ui len, ui Size){
     rev.Resize(len);
     for(ui i=0;i<len;i++)
@@ -389,4 +398,44 @@ void swap(Complex& x, Complex& y){
     Complex tmp=x;
     x=y;
     y=tmp;
+}
+
+inline MyNumber operator+(ll num1, MyNumber num2){
+    return num2+num1;
+}
+
+inline MyNumber operator-(ll num1, MyNumber num2){
+    return num2-num1;
+}
+
+inline MyNumber operator*(ll num1, MyNumber num2){
+    return num2*num1;
+}
+
+inline MyNumber operator/(ll num1, MyNumber num2){
+    return num2/num1;
+}
+
+inline MyNumber operator+=(ll& num1, MyNumber num2){
+    ll tmp=num2.GetNumber()[0]+num2.GetNumber()[1]*Lim;
+    if(num2.GetSign())tmp=-tmp;
+    return num1+=tmp;
+}
+
+inline MyNumber operator-=(ll& num1, MyNumber num2){
+    ll tmp=num2.GetNumber()[0]+num2.GetNumber()[1]*Lim;
+    if(num2.GetSign())tmp=-tmp;
+    return num1+=tmp;
+}
+
+inline MyNumber operator*=(ll& num1, MyNumber num2){
+    ll tmp=num2.GetNumber()[0]+num2.GetNumber()[1]*Lim;
+    if(num2.GetSign())tmp=-tmp;
+    return num1+=tmp;
+}
+
+inline MyNumber operator/=(ll& num1, MyNumber num2){
+    ll tmp=num2.GetNumber()[0]+num2.GetNumber()[1]*Lim;
+    if(num2.GetSign())tmp=-tmp;
+    return num1+=tmp;
 }

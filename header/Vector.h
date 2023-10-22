@@ -3,7 +3,6 @@
 #define ui unsigned int
 
 #include <assert.h>
-#include <cstdio>
 #include <algorithm>
 
 template<class T>
