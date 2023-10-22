@@ -24,16 +24,15 @@ class Vector{
         T& operator[](ui pos);
         const T& operator[](ui pos)const;
 
-        ui Capacity()const;
         ui Size()const;
         bool Empty();
         bool Empty()const;
-        void Swap(Vector<T>& x);
         void Clear();
-        void ShrinkToFit();
         iterator& Begin();
         iterator& End();
         iterator& EOS();
+        iterator& begin();
+        iterator& end();
         T& Front();
         T& Back();
 
@@ -42,8 +41,13 @@ class Vector{
         iterator Insert(iterator p, const T& val);
         iterator Erase(iterator p);
 
+        void ShrinkToFit();
         void Reserse(ui size);
         void Resize(ui size, const T& val=T());
+
+    protected:
+        void Swap(Vector<T>& x);
+        ui Capacity()const;
 
     private:
         iterator Start;
@@ -129,11 +133,6 @@ Vector<T>::~Vector(){
 }
 
 template<class T>
-ui Vector<T>::Capacity()const{
-    return EndOfStorage-Start;
-}
-
-template<class T>
 ui Vector<T>::Size()const{
     return Finish-Start;
 }
@@ -149,21 +148,8 @@ bool Vector<T>::Empty()const{
 }
 
 template<class T>
-void Vector<T>::Swap(Vector<T>& x){
-    std::swap(Start, x.Begin());
-    std::swap(Finish, x.End());
-    std::swap(EndOfStorage, x.EOS());
-}
-
-template<class T>
 void Vector<T>::Clear(){
     Finish=Start;
-}
-
-template<class T>
-void Vector<T>::ShrinkToFit(){
-    if(Finish==EndOfStorage)return;
-    Reserse(Size());
 }
 
 template<class T>
@@ -179,6 +165,16 @@ typename Vector<T>::iterator& Vector<T>::End(){
 template<class T>
 typename Vector<T>::iterator& Vector<T>::EOS(){
     return EndOfStorage;
+}
+
+template<class T>
+typename Vector<T>::iterator& Vector<T>::begin(){
+    return Start;
+}
+
+template<class T>
+typename Vector<T>::iterator& Vector<T>::end(){
+    return Finish;
 }
 
 template<class T>
@@ -239,11 +235,17 @@ typename Vector<T>::iterator Vector<T>::Erase(typename Vector<T>::iterator p){
 }
 
 template<class T>
+void Vector<T>::ShrinkToFit(){
+    if(Finish==EndOfStorage)return;
+    Reserse(Size());
+}
+
+template<class T>
 void Vector<T>::Reserse(ui size){
     if(size>Capacity()){
         ui oldSize=Size();
         T* tmp=new T[size];
-        if(Start==nullptr){
+        if(Start!=nullptr){
             for(int i=0;i<oldSize;i++)
                 tmp[i]=Start[i];
             delete []Start;
@@ -279,6 +281,18 @@ void Vector<T>::Resize(ui size, const T& val){
             }
         }
     }
+}
+
+template<class T>
+void Vector<T>::Swap(Vector<T>& x){
+    std::swap(Start, x.Begin());
+    std::swap(Finish, x.End());
+    std::swap(EndOfStorage, x.EOS());
+}
+
+template<class T>
+ui Vector<T>::Capacity()const{
+    return EndOfStorage-Start;
 }
 
 #endif

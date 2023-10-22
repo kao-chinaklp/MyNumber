@@ -314,15 +314,14 @@ MyNumber MyNumber::operator*(ll num){
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
+    bool flag=this->GetSign()==num.GetSign();
+    this->SetSign(false), num.SetSign(false);
     Vector<Complex> ans, num1, num2;
     Vector<ui> res;
     string str=this->Str();
     int len1=str.size();
     for(auto i=str.rbegin();i!=str.rend();i++)
         num1.PushBack(Complex(double(*i-48)));
-        /////////////////////////bug
-    for(auto i=0;i!=5;i++)
-        printf("%s ",num1[i].Str().c_str());
     str=num.Str();
     int len2=str.size();
     for(auto i=str.rbegin();i!=str.rend();i++)
@@ -345,17 +344,17 @@ MyNumber MyNumber::operator*(MyNumber num){
             res[i]%=10;
         }
     }
-    if(res.Back()>9){
-        res.PushBack(res.Back()/10);
-        *(res.End()-2)%=10;
+    while(res[len-1]==0&&len>1)len--;
+    while(res[len-1]>9){
+        res.PushBack(res[len-1]/10);
+        res[len-1]%=10;
         len++;
     }
-    while(res[len-1]==0&&len>0)len--;
     while(len>0&&res[len-1]==0)len--;
     str.clear();
     for(int i=len-1;i>=0;i--)
         str.push_back(res[i]+48);
-    return MyNumber(str);
+    return MyNumber((flag?"":"-")+str);
 }
 
 void MyNumber::FFTInit(ui len, ui Size){
