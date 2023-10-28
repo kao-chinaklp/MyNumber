@@ -3,7 +3,13 @@
 #define ui unsigned int
 
 #include <assert.h>
-#include <algorithm>
+
+template<class T>
+void inline swap(T& a,T& b){
+    T c=a;
+    a=b;
+    c=b;
+}
 
 template<class T>
 class Vector{
@@ -35,6 +41,7 @@ class Vector{
         T& Front();
         T& Back();
 
+        void Assign(const T size, const T& val);
         void PushBack(const T& val);
         void PopBack();
         iterator Insert(iterator p, const T& val);
@@ -189,6 +196,12 @@ T& Vector<T>::Back(){
 }
 
 template<class T>
+void Vector<T>::Assign(const T size, const T& val){
+    for(int i=0;i<size;i++)    
+        *(Start+i)=val;
+}
+
+template<class T>
 void Vector<T>::PushBack(const T& val){
     Insert(End(), val);
 }
@@ -284,9 +297,9 @@ void Vector<T>::Resize(ui size, const T& val){
 
 template<class T>
 void Vector<T>::Swap(Vector<T>& x){
-    std::swap(Start, x.Begin());
-    std::swap(Finish, x.End());
-    std::swap(EndOfStorage, x.EOS());
+    swap(Start, x.Begin());
+    swap(Finish, x.End());
+    swap(EndOfStorage, x.EOS());
 }
 
 template<class T>

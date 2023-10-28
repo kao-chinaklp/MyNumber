@@ -1,13 +1,20 @@
 #include "MyNumber.h"
 
+#include <algorithm>
+
 using std::string;
 using std::ceil, std::reverse, std::max;
 
 MyNumber::MyNumber(ll num){
     this->jump=false;
+    this->Number.Clear();
+    if(num==0){
+        this->Number.PushBack(0);
+        this->Sign=false;
+        return;
+    }
     if(num<0)this->Sign=true,num=-num;
     else this->Sign=false;
-    this->Number.Clear();
     while(num){
         this->Number.PushBack(num%Lim);
         num/=Lim;
@@ -39,9 +46,15 @@ MyNumber::~MyNumber(){
 }
 
 MyNumber& MyNumber::operator=(ll num){
+    this->jump=false;
+    this->Number.Clear();
+    if(num==0){
+        this->Number.PushBack(0);
+        this->Sign=false;
+        return *this;
+    }
     if(num<0)this->Sign=true,num=-num;
     else this->Sign=false;
-    this->Number.Clear();
     while(num){
         this->Number.PushBack(num%Lim);
         num/=Lim;
@@ -67,7 +80,7 @@ MyNumber& MyNumber::operator=(string num){
     return *this;
 }
 
-MyNumber& MyNumber::operator=(MyNumber& num){
+MyNumber& MyNumber::operator=(MyNumber num){
     this->Sign=num.GetSign();
     this->Number=Vector<ui>(num.GetNumber());
     return *this;
@@ -99,18 +112,14 @@ void MyNumber::RemoveLeadingZero(){
 }
 
 string MyNumber::Str(){
+    this->RemoveLeadingZero();
     string out="";
-    for(int p=0,len=this->GetSize();p<len;p++){
-        ui tmp=this->Number[p];
-        int cnt=0;
-        while(++cnt<=9&&tmp>0){
-            out.push_back(tmp%10+48);
-            tmp/=10;
-        }
+    for(int p=0, len=this->GetSize();p<len;p++){
+        string tmp=std::to_string(this->Number[p]);
+        if(p<len-1)while(tmp.size()<9)tmp.insert(tmp.begin(), '0');
+        out=tmp+out;
     }
-    while(out.size()>1&&out.back()=='0')out.pop_back();
-    reverse(out.begin(),out.end());
-    if(this->Sign)out.insert(out.begin(),'-');
+    if(this->Sign&&out!="0")out.insert(out.begin(), '-');
     return out;
 }
 
@@ -187,13 +196,12 @@ MyNumber MyNumber::operator-(){
 }
 
 bool MyNumber::operator==(ll num){
-    MyNumber tmp(num);
-    return (*this)==tmp;
+    return (*this)==MyNumber(num);
 }
 
 bool MyNumber::operator==(MyNumber num){
-    if(this->GetSize()!=num.GetSize())return false;
-    if(this->GetSign()!=num.GetSign())return false;
+    if(this->GetSize()!=num.GetSize()||this->GetSign()!=num.GetSign())
+        return false;
     for(int i=0,len=this->GetSize();i<len;i++)
         if((*this)[i]!=num[i])return false;
     return true;
@@ -209,8 +217,7 @@ bool MyNumber::operator!=(MyNumber num){
 }
 
 bool MyNumber::operator<(ll num){
-    MyNumber tmp(num);
-    return *this<tmp;
+    return *this<MyNumber(num);
 }
 
 bool MyNumber::operator<(MyNumber num){
@@ -225,8 +232,7 @@ bool MyNumber::operator<(MyNumber num){
 }
 
 bool MyNumber::operator>(ll num){
-    MyNumber tmp(num);
-    return *this<tmp;
+    return *this<MyNumber(num);
 }
 
 bool MyNumber::operator>(MyNumber num){
@@ -257,8 +263,7 @@ bool MyNumber::operator>=(MyNumber num){
 }
 
 MyNumber MyNumber::operator+(ll num){
-    MyNumber tmp(num);
-    return *this+tmp;
+    return *this+MyNumber(num);
 }
 
 MyNumber MyNumber::operator+(MyNumber num){
@@ -279,8 +284,7 @@ MyNumber MyNumber::operator+(MyNumber num){
 }
 
 MyNumber MyNumber::operator-(ll num){
-    MyNumber tmp(num);
-    return *this-tmp;
+    return *this-MyNumber(num);
 }
 
 MyNumber MyNumber::operator-(MyNumber num){
@@ -307,11 +311,11 @@ MyNumber MyNumber::operator-(MyNumber num){
 }
 
 MyNumber MyNumber::operator*(ll num){
-    MyNumber tmp(num);
-    return *this*tmp;
+    return *this*MyNumber(num);
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
+    if(*this==0||num==0)return MyNumber(0);
     bool flag=this->GetSign()==num.GetSign();
     this->SetSign(false), num.SetSign(false);
     Vector<Complex> ans, num1, num2;
@@ -356,14 +360,47 @@ MyNumber MyNumber::operator*(MyNumber num){
 }
 
 MyNumber MyNumber::operator/(ll num){
+    return *this/MyNumber(num);
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
     MyNumber ans(*this);
-    ui times=max(10, int(ceil(log2(num.GetSize()))));/// to do
+    ui times=max(1, int(ceil(num.CountBits()/0.301)));
     for(int i=1;i<=times;i++)
-        ans*=2-num*ans;
+        ans*=2-ans*num;
     return ans;
+}
+
+MyNumber MyNumber::operator+=(MyNumber num){
+    return *this=*this*num;
+}
+
+MyNumber MyNumber::operator+=(ll num){
+    return *this=*this+MyNumber(num);
+}
+
+MyNumber MyNumber::operator-=(MyNumber num){
+    return *this=*this*num;
+}
+
+MyNumber MyNumber::operator-=(ll num){
+    return *this=*this-MyNumber(num);
+}
+
+MyNumber MyNumber::operator*=(MyNumber num){
+    return *this=*this*num;
+}
+
+MyNumber MyNumber::operator*=(ll num){
+    return *this=*this*MyNumber(num);
+}
+
+MyNumber MyNumber::operator/=(MyNumber num){
+    return *this=*this/num;
+}
+
+MyNumber MyNumber::operator/=(ll num){
+    return *this=*this/MyNumber(num);
 }
 
 void MyNumber::FFTInit(ui len, ui Size){
@@ -388,16 +425,8 @@ void MyNumber::FFT(Vector<Complex>& arr, int n, int inv){
     }
 }
 
-void swap(MyNumber& x, MyNumber& y){
-    MyNumber tmp=x;
-    x=y;
-    y=tmp;
-}
-
-void swap(Complex& x, Complex& y){
-    Complex tmp=x;
-    x=y;
-    y=tmp;
+ui MyNumber::CountBits(){
+    return std::to_string(this->Number.Back()).size()+(this->GetSize()-1)*9;
 }
 
 inline MyNumber operator+(ll num1, MyNumber num2){

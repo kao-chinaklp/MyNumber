@@ -19,7 +19,7 @@ class MyNumber{
         MyNumber(MyNumber& num);
         MyNumber& operator=(ll num);
         MyNumber& operator=(std::string num);
-        MyNumber& operator=(MyNumber& num);
+        MyNumber& operator=(MyNumber num);
 
     public:
         ~MyNumber();
@@ -77,6 +77,7 @@ class MyNumber{
         Vector<ui> rev;
         void FFTInit(ui len, ui size);
         void FFT(Vector<Complex >& arr, int n, int inv);
+        ui CountBits();
 };
 
 MyNumber operator+(ll num1, MyNumber num2);
@@ -87,8 +88,5 @@ MyNumber operator+=(ll& num1, MyNumber num2);
 MyNumber operator-=(ll& num1, MyNumber num2);
 MyNumber operator*=(ll& num1, MyNumber num2);
 MyNumber operator/=(ll& num1, MyNumber num2);
-
-void swap(MyNumber& x, MyNumber& y);
-void swap(Complex& x, Complex& y);
 
 #endif
