@@ -41,7 +41,8 @@ class Vector{
         T& Front();
         T& Back();
 
-        void Assign(const T size, const T& val);
+        void Assign(const ui size, const T& val);
+        void Assign(iterator _start, iterator _end);
         void PushBack(const T& val);
         void PopBack();
         iterator Insert(iterator p, const T& val);
@@ -196,9 +197,18 @@ T& Vector<T>::Back(){
 }
 
 template<class T>
-void Vector<T>::Assign(const T size, const T& val){
+void Vector<T>::Assign(const ui size, const T& val){
     for(int i=0;i<size;i++)    
         *(Start+i)=val;
+}
+
+template<class T>
+void Vector<T>::Assign(Vector<T>::iterator _start, Vector<T>::iterator _end){
+    ui new_size=_end-_start;
+    if(new_size>this->Size())
+        this->Resize(new_size);
+    for(ui i=0;i<new_size;i++)
+        *(Start+i)=*(_start+i);
 }
 
 template<class T>

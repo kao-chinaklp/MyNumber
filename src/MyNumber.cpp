@@ -364,11 +364,13 @@ MyNumber MyNumber::operator/(ll num){
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
-    MyNumber ans(*this);
+    MyNumber ans(*this), x0(1);
     ui times=max(1, int(ceil(num.CountBits()/0.301)));
-    for(int i=1;i<=times;i++)
-        ans*=2-ans*num;
-    return ans;
+    for(int i=1;i<=times;i++){
+        x0*=2-num*x0;
+        printf("%s\n",x0.Str().c_str());
+    }
+    return ans*x0;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
