@@ -16,6 +16,24 @@ class Vector{
     public:
         typedef T value_type;
         typedef value_type* iterator;
+        struct reverseIterator{
+            reverseIterator()=default;
+            reverseIterator(const Vector<T>::iterator& it):rIt(it){}
+            reverseIterator(const reverseIterator &it):rIt(it){}
+            reverseIterator operator++(){return --rIt;}
+            reverseIterator operator++(int){return rIt--;}
+            reverseIterator operator--(){return ++rIt;}
+            reverseIterator operator--(int){return rIt++;}
+            reverseIterator operator+(const long long num){return rIt-num;}
+            reverseIterator operator-(const long long num){return rIt+num;}
+            reverseIterator operator+=(const long long num){return rIt-=num;}
+            reverseIterator operator-=(const long long num){return rIt+=num;}
+            bool operator==(const reverseIterator& it)const{return rIt==it.rIt;}
+            bool operator!=(const reverseIterator& it)const{return rIt!=it.rIt;}
+            T& operator*(const reverseIterator&);
+
+            Vector<T>::iterator rIt;
+        };
 
         Vector();
         Vector(ui size, const T val=0);
@@ -24,8 +42,6 @@ class Vector{
         Vector(const Vector<T>& x);
         ~Vector();
 
-        Vector<T> operator=(Vector<T>& x);
-        const Vector<T> operator=(const Vector<T>& x);
         T& operator[](ui pos);
         const T& operator[](ui pos)const;
 
@@ -33,11 +49,19 @@ class Vector{
         bool Empty();
         bool Empty()const;
         void Clear();
+        const iterator& Begin()const;
+        const iterator& End()const;
+        const iterator& EOS()const;
+        const iterator& begin()const;
+        const iterator& end()const;
+        const reverseIterator& Rbegin()const;
+        const reverseIterator& Rend()const;
         iterator& Begin();
         iterator& End();
-        iterator& EOS();
         iterator& begin();
         iterator& end();
+        reverseIterator& Rbegin();
+        reverseIterator& Rend();
         T& Front();
         T& Back();
 
@@ -45,32 +69,37 @@ class Vector{
         void Assign(iterator _start, iterator _end);
         void PushBack(const T& val);
         void PopBack();
+        iterator Insert(const ui pos, const T& val);
         iterator Insert(iterator p, const T& val);
         iterator Erase(iterator p);
+        iterator Erase(const ui pos, const ui size=1);
 
         void ShrinkToFit();
         void Reserse(ui size);
         void Resize(ui size, const T& val=T());
 
     protected:
-        void Swap(Vector<T>& x);
         ui Capacity()const;
 
     private:
         iterator Start;
         iterator Finish;
         iterator EndOfStorage;
+        reverseIterator Rstart;
+        reverseIterator Rfinish;
 };
 
 template<class T>
 Vector<T>::Vector(){
-    Start=Finish=EndOfStorage=nullptr;
+    Rstart=Rfinish=Start=Finish=EndOfStorage=nullptr;
 }
 
 template<class T>
 Vector<T>::Vector(ui size, const T val){
     Start=new T[size];
     Finish=Start+size;
+    Rstart=Finish-1;
+    Rfinish=Start-1;
     EndOfStorage=Start+size;
     for(int i=0;i<size;i++)
         Start[i]=val;
@@ -80,6 +109,8 @@ template<class T>
 Vector<T>::Vector(int size, const T val){
     Start=new T[size];
     Finish=Start+size;
+    Rstart=Finish-1;
+    Rfinish=Start-1;
     EndOfStorage=Start+size;
     for(int i=0;i<size;i++)
         Start[i]=val;
@@ -91,6 +122,8 @@ Vector<T>::Vector(const iterator _start, const iterator _end){
         PushBack(*_start);
         ++_start;
     }
+    Rstart=End()-1;
+    Rfinish=Begin()-1;
 }
 
 template<class T>
@@ -99,26 +132,9 @@ Vector<T>::Vector(const Vector<T>& x){
     for(int i=0,len=x.Size();i<len;i++)
         Start[i]=x[i];
     Finish=Start+x.Size();
+    Rstart=Finish-1;
+    Rfinish=Start-1;
     EndOfStorage=Start+x.Capacity();
-}
-
-template<class T>
-Vector<T> Vector<T>::operator=(Vector<T>& x){
-    Swap(x);
-    return *this;
-}
-
-template<class T>
-const Vector<T> Vector<T>::operator=(const Vector<T>& x){
-    T* tmp=new T[x.Capacity()];
-    for(int i=0,len=x.Size();i<len;i++)
-        tmp[i]=x[i];
-    if(Start!=nullptr)delete []Start;
-    Start=tmp;
-    Finish=Start+x.Size();
-    EndOfStorage=Start+x.Capacity();
-    return *this;
-    
 }
 
 template<class T>
@@ -160,6 +176,41 @@ void Vector<T>::Clear(){
 }
 
 template<class T>
+const typename Vector<T>::iterator& Vector<T>::Begin()const{
+    return Start;
+}
+
+template<class T>
+const typename Vector<T>::iterator& Vector<T>::End()const{
+    return Finish;
+}
+
+template<class T>
+const typename Vector<T>::iterator& Vector<T>::EOS()const{
+    return EndOfStorage;
+}
+
+template<class T>
+const typename Vector<T>::iterator& Vector<T>::begin()const{
+    return Start;
+}
+
+template<class T>
+const typename Vector<T>::iterator& Vector<T>::end()const{
+    return Finish;
+}
+
+template<class T>
+const typename Vector<T>::reverseIterator& Vector<T>::Rbegin()const{
+    return Rstart;
+}
+
+template<class T>
+const typename Vector<T>::reverseIterator& Vector<T>::Rend()const{
+    return Rfinish;
+}
+
+template<class T>
 typename Vector<T>::iterator& Vector<T>::Begin(){
     return Start;
 }
@@ -170,11 +221,6 @@ typename Vector<T>::iterator& Vector<T>::End(){
 }
 
 template<class T>
-typename Vector<T>::iterator& Vector<T>::EOS(){
-    return EndOfStorage;
-}
-
-template<class T>
 typename Vector<T>::iterator& Vector<T>::begin(){
     return Start;
 }
@@ -182,6 +228,16 @@ typename Vector<T>::iterator& Vector<T>::begin(){
 template<class T>
 typename Vector<T>::iterator& Vector<T>::end(){
     return Finish;
+}
+
+template<class T>
+typename Vector<T>::reverseIterator& Vector<T>::Rbegin(){
+    return Rstart;
+}
+
+template<class T>
+typename Vector<T>::reverseIterator& Vector<T>::Rend(){
+    return Rfinish;
 }
 
 template<class T>
@@ -223,6 +279,11 @@ void Vector<T>::PopBack(){
 }
 
 template<class T>
+typename Vector<T>::iterator Vector<T>::Insert(const ui pos, const T& val){
+	return this->Insert(Start+pos, val);
+}
+
+template<class T>
 typename Vector<T>::iterator Vector<T>::Insert(typename Vector<T>::iterator p, const T& val){
     assert(p>=Start);
     assert(p<=Finish);
@@ -254,6 +315,15 @@ typename Vector<T>::iterator Vector<T>::Erase(typename Vector<T>::iterator p){
     }
     --Finish;
     return p;
+}
+
+template<class T>
+typename Vector<T>::iterator Vector<T>::Erase(const ui pos, const ui size){
+    assert(pos+size<=this->Size());
+    for(ui p=pos+size, len=this->Size();p<len;p++)
+        Start[p-size]=Start[p];
+    this->ShrinkToFit();
+    return Start+pos;
 }
 
 template<class T>
@@ -306,15 +376,13 @@ void Vector<T>::Resize(ui size, const T& val){
 }
 
 template<class T>
-void Vector<T>::Swap(Vector<T>& x){
-    swap(Start, x.Begin());
-    swap(Finish, x.End());
-    swap(EndOfStorage, x.EOS());
+ui Vector<T>::Capacity()const{
+    return EndOfStorage-Start;
 }
 
 template<class T>
-ui Vector<T>::Capacity()const{
-    return EndOfStorage-Start;
+T& operator*(const typename Vector<T>::reverseIterator& rIt){
+    return *rIt.rIt;
 }
 
 #endif

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-using std::string;
 using std::ceil, std::reverse, std::max;
 
 MyNumber::MyNumber(ll num){
@@ -21,15 +20,15 @@ MyNumber::MyNumber(ll num){
     }
 }
 
-MyNumber::MyNumber(string num){
+MyNumber::MyNumber(String num){
     this->jump=false;
-    if(num[0]=='-')this->Sign=true,num.erase(num.begin());
+    if(num[0]=='-')this->Sign=true,num.Erase(num.begin());
     else this->Sign=false;
     this->Number.Clear();
-    string tmp;
-    for(int i=0, len=num.size();i<len;i+=9){
-        tmp=num.substr(i,std::min(9, len-i));
-        this->Number.PushBack(atoi(tmp.c_str()));
+    String tmp;
+    for(int i=0, len=num.Size();i<len;i+=9){
+        tmp=num.Substr(i, std::min(9, len-i));
+        this->Number.PushBack(ToDigit(tmp));
     }
     reverse(this->Number.Begin(), this->Number.End());
 }
@@ -62,12 +61,12 @@ MyNumber& MyNumber::operator=(ll num){
     return *this;
 }
 
-MyNumber& MyNumber::operator=(string num){
-    if(num[0]=='-')this->Sign=true,num.erase(num.begin());
+MyNumber& MyNumber::operator=(String num){
+    if(num[0]=='-')this->Sign=true,num.Erase(num.begin());
     else this->Sign=false;
     this->Number.Clear();
-    int tmp,cnt=num.size()-1,bit;
-    const ui _size=num.size();
+    int tmp,cnt=num.Size()-1,bit;
+    const ui _size=num.Size();
     for(ui i=0,len=ceil(_size/9.0);i<len;i++){
         tmp=0, bit=1;
         while(bit!=Lim&&cnt>=0){
@@ -111,15 +110,18 @@ void MyNumber::RemoveLeadingZero(){
         this->Number.PopBack();
 }
 
-string MyNumber::Str(){
+#include <iostream>
+
+String MyNumber::Str(){
     this->RemoveLeadingZero();
-    string out="";
+    String out="";
     for(int p=0, len=this->GetSize();p<len;p++){
-        string tmp=std::to_string(this->Number[p]);
-        if(p<len-1)while(tmp.size()<9)tmp.insert(tmp.begin(), '0');
+        String tmp=ToString(this->Number[p]);
+        if(p<len-1)while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
         out=tmp+out;
     }
-    if(this->Sign&&out!="0")out.insert(out.begin(), '-');
+    if(this->Sign&&out!="0")out.Insert(out.begin(), '-');
+    std::cout<<out<<std::endl;
     return out;
 }
 
@@ -318,45 +320,81 @@ MyNumber MyNumber::operator*(MyNumber num){
     if(*this==0||num==0)return MyNumber(0);
     bool flag=this->GetSign()==num.GetSign();
     this->SetSign(false), num.SetSign(false);
-    Vector<Complex> ans, num1, num2;
-    Vector<ui> res;
-    string str=this->Str();
-    int len1=str.size();
-    for(auto i=str.rbegin();i!=str.rend();i++)
-        num1.PushBack(Complex(double(*i-48)));
+    Vector<ui> num1, num2;
+    String str=this->Str();
+    ui len1=str.Size();
+    for(char& c:str)num1.PushBack(c-48);
     str=num.Str();
-    int len2=str.size();
-    for(auto i=str.rbegin();i!=str.rend();i++)
-        num2.PushBack(Complex(double(*i-48)));
-    int len=1, l=0;
-    while(len<len1+len2)len<<=1,l++;
-    ans.Resize(len);
-    res.Resize(len);
+    ui len2=str.Size();
+    for(char& c:str)num2.PushBack(c-48);
+    ui len=1, l=0;
+    while(len<len1+len2)len<<=1, l++;
     num1.Resize(len), num2.Resize(len);
-    FFTInit(len, l);
-    FFT(num1, len, 1);
-    FFT(num2, len, 1);
-    for(int i=0;i<len;i++)
-        ans[i]=num1[i]*num2[i];
-    FFT(ans, len, -1);
-    for(int i=0;i<len;i++){
-        res[i]+=ans[i].Real()/len+eps;
+    NTTInit(len, l);
+    NTT(num1, len, 1);
+    NTT(num2, len, 1);
+    for(ui i=0;i<len;i++)
+        num1[i]=1ll*num1[i]*num2[i]%mod;
+    NTT(num1, len, 0);
+    ll inv=FastPow(len, mod-2);// Inverse
+    for(ui i=0;i<len;i++){
+        num1[i]=1ll*num1[i]*inv%mod;
         if(i<len-1){
-            res[i+1]+=res[i]/10;
-            res[i]%=10;
+            num1[i+1]+=num1[i]/10;
+            num1[i]%=10;
         }
     }
-    while(res[len-1]==0&&len>1)len--;
-    while(res[len-1]>9){
-        res.PushBack(res[len-1]/10);
-        res[len-1]%=10;
+    while(num1[len-1]>9){
+        num1.PushBack(num1[len-1]/10);
+        num1[len-1]%=10;
         len++;
     }
-    while(len>0&&res[len-1]==0)len--;
-    str.clear();
-    for(int i=len-1;i>=0;i--)
-        str.push_back(res[i]+48);
-    return MyNumber((flag?"":"-")+str);
+    while(len>1&&num1[len-1]==0)--len;
+    str.Clear();
+    for(ui i=len-1;i>=0;i--)
+        str.PushBack(char(num1[i]));
+    return MyNumber(str);
+    // This part of FFT was replaced by NTT
+    // 
+    // Vector<Complex> ans, num1, num2;
+    // Vector<ui> res;
+    // String str=this->Str();
+    // int len1=str.Size();
+    // for(auto i=str.Rbegin();i!=str.Rend();i++)
+    //     num1.PushBack(Complex(double(*i-48)));
+    // str=num.Str();
+    // int len2=str.Size();
+    // for(auto i=str.Rbegin();i!=str.Rend();i++)
+    //     num2.PushBack(Complex(double(*i-48)));
+    // int len=1, l=0;
+    // while(len<len1+len2)len<<=1,l++;
+    // ans.Resize(len);
+    // res.Resize(len);
+    // num1.Resize(len), num2.Resize(len);
+    // FFTInit(len, l);
+    // FFT(num1, len, 1);
+    // FFT(num2, len, 1);
+    // for(int i=0;i<len;i++)
+    //     ans[i]=num1[i]*num2[i];
+    // FFT(ans, len, -1);
+    // for(int i=0;i<len;i++){
+    //     res[i]+=ans[i].Real()/len+eps;
+    //     if(i<len-1){
+    //         res[i+1]+=res[i]/10;
+    //         res[i]%=10;
+    //     }
+    // }
+    // while(res[len-1]==0&&len>1)len--;
+    // while(res[len-1]>9){
+    //     res.PushBack(res[len-1]/10);
+    //     res[len-1]%=10;
+    //     len++;
+    // }
+    // while(len>0&&res[len-1]==0)len--;
+    // str.Clear();
+    // for(int i=len-1;i>=0;i--)
+    //     str.PushBack(res[i]+48);
+    // return MyNumber((flag?"":"-")+str);
 }
 
 MyNumber MyNumber::operator/(ll num){
@@ -364,13 +402,15 @@ MyNumber MyNumber::operator/(ll num){
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
-    MyNumber ans(*this), x0(1);
-    ui times=max(1, int(ceil(num.CountBits()/0.301)));
-    for(int i=1;i<=times;i++){
-        x0*=2-num*x0;
-        printf("%s\n",x0.Str().c_str());
-    }
-    return ans*x0;
+    // To do ...
+    // MyNumber ans(*this), x0(1);
+    // ui times=max(1, int(ceil(num.CountBits()/0.301)));
+    // for(int i=1;i<=times;i++){
+    //     x0*=2-num*x0;
+    //     printf("%s\n",x0.Str().c_str());
+    // }
+    // return ans*x0;
+    return MyNumber(0);
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
@@ -405,7 +445,23 @@ MyNumber MyNumber::operator/=(ll num){
     return *this=*this/MyNumber(num);
 }
 
+ll MyNumber::FastPow(ll num, ll idx){
+    ll res=1;
+    while(idx){
+        if(idx&1)res=(res*num)%mod;
+        num=(num*num)%mod;
+        idx>>=1;
+    }
+    return res;
+}
+
 void MyNumber::FFTInit(ui len, ui Size){
+    rev.Resize(len);
+    for(ui i=0;i<len;i++)
+        rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
+}
+
+void MyNumber::NTTInit(ui len, ui Size){
     rev.Resize(len);
     for(ui i=0;i<len;i++)
         rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
@@ -422,6 +478,22 @@ void MyNumber::FFT(Vector<Complex>& arr, int n, int inv){
                 Complex x=arr[j+k], y=w0*arr[i+j+k];
                 arr[j+k]=x+y;
                 arr[i+j+k]=x-y;
+            }
+        }
+    }
+}
+
+void MyNumber::NTT(Vector<ui>& arr, int n, int inv){
+    for(ui i=0;i<n;i++)
+        if(i<rev[i])swap(arr[i], arr[rev[i]]);
+    for(ui i=1;i<n;i<<=1){
+        ll gn=FastPow(inv?g:gi, (mod-1)/(i<<1));
+        for(ui j=0;j<n;j+=(i<<1)){
+            ll g0=1;
+            for(int k=0;k<i;++k, g0=g0*gn%mod){
+                ll x=arr[j+k], y=g0*arr[i+j+k]%mod;
+                arr[j+k]=(x+y)%mod;
+                arr[i+j+k]=(x-y+mod)%mod;
             }
         }
     }

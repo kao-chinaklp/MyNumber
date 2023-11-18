@@ -15,10 +15,10 @@ class MyNumber{
     public:
         MyNumber()=default;
         MyNumber(ll num);
-        MyNumber(std::string num);
+        MyNumber(String num);
         MyNumber(MyNumber& num);
         MyNumber& operator=(ll num);
-        MyNumber& operator=(std::string num);
+        MyNumber& operator=(String num);
         MyNumber& operator=(MyNumber num);
 
     public:
@@ -29,7 +29,7 @@ class MyNumber{
         void SetSize(ui new_size);
         Vector<ui> GetNumber();
         void RemoveLeadingZero();
-        std::string Str();
+        String Str();
 
     public:
         ui& operator[](ui idx);
@@ -72,11 +72,16 @@ class MyNumber{
         MyNumber operator/=(MyNumber num);
 
     private:
+        const ui mod=998244353;
+        const ui g=3, gi=332748118;
         bool Sign; // true == negative  false == positive
         Vector<ui> Number;
         Vector<ui> rev;
+        ll FastPow(ll num, ll idx);
         void FFTInit(ui len, ui size);
-        void FFT(Vector<Complex >& arr, int n, int inv);
+        void NTTInit(ui len, ui size);
+        void FFT(Vector<Complex>& arr, int n, int inv);
+        void NTT(Vector<ui>& arr, int n, int inv);
         ui CountBits();
 };
 

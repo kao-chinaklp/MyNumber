@@ -1,7 +1,7 @@
 #ifndef COMPLEX_H_
 #define COMPLEX_H_
 
-#include <string>
+#include "String.h"
 
 class Complex{
     public:
@@ -28,7 +28,7 @@ class Complex{
         bool operator!=(Complex num)const;
         bool operator!=(double num)const;
 
-        std::string Str()const;
+        String Str()const;
 
     private:
         double imag;

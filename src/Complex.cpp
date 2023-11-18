@@ -79,11 +79,11 @@ bool Complex::operator!=(double num)const{
     return this->real!=num||this->imag!=0;
 }
 
-std::string Complex::Str()const{
-    std::string num=std::to_string((int)this->real);
+String Complex::Str()const{
+    String num=ToString((int)this->real);
     if(this->imag==0)return num;
-    if(this->imag<0)return num+'-'+std::to_string(-(int)this->imag)+'i';
-    if(this->imag>0)return num+'+'+std::to_string((int)this->imag)+'i';
+    if(this->imag<0)return num+'-'+ToString(-(int)this->imag)+'i';
+    if(this->imag>0)return num+'+'+ToString((int)this->imag)+'i';
     return "";
 }
 

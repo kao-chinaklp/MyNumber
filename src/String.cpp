@@ -1,6 +1,8 @@
 #include "String.h"
 
-String::String(char* init){
+#include <algorithm>
+
+String::String(const char* init){
     ui size=sizeof(init);
     Data.Resize(size);Data.ShrinkToFit();
     for(ui i=0;i<size;i++)
@@ -53,17 +55,93 @@ ui String::Size()const{
     return Data.Size();
 }
 
-String String::operator=(String& str){
-    Data=str.Data;
-    return *this;
+void String::PushBack(const char c){
+    this->Append(c);
 }
 
-String String::operator=(char* str){
-    ui size=sizeof(str);
-    Data.Resize(size);Data.ShrinkToFit();
-    for(ui i=0;i<size;i++)
-        Data[i]=str[i];
-    return *this;
+void String::PopBack(){
+    Data.PopBack();
+}
+
+void String::Append(const char c){
+    Data.PushBack(c);
+}
+
+void String::Append(const String str){
+    Data.Reserse(this->Size()+str.Size());
+    for(char& c:str)Data.PushBack(c);
+}
+
+void String::Clear(){
+    Data.Clear();
+}
+
+void String::Resize(ui size){
+    Data.Resize(size);
+}
+
+String::iterator String::Insert(const ui pos, const char& c){
+	return Data.Insert(pos, c);
+}
+
+String::iterator String::Insert(String::iterator p, const char& c){
+    return Data.Insert(p, c);
+}
+
+String::iterator String::Erase(const ui pos, const ui size){
+    return Data.Erase(pos, size);
+}
+
+String::iterator String::Erase(String::iterator p){
+    return Data.Erase(p);
+}
+
+String String::Substr(const ui pos, const ui size){
+    assert(pos+size<=this->Size());
+    String res="";
+    for(int p=pos;p<pos+size;p++)
+        res.PushBack((*this)[p]);
+    return res;
+}
+
+const String::iterator& String::Begin()const{
+    return Data.Begin();
+}
+
+const String::iterator& String::End()const{
+    return Data.End();
+}
+
+const String::iterator& String::begin()const{
+    return Data.Begin();
+}
+
+const String::iterator& String::end()const{
+    return Data.End();
+}
+
+const Vector<char>::reverseIterator& String::Rbegin()const{
+    return Data.Rbegin();
+}
+
+const Vector<char>::reverseIterator& String::Rend()const{
+    return Data.Rend();
+}
+
+String::iterator& String::Begin(){
+    return Data.Begin();
+}
+
+String::iterator& String::End(){
+    return Data.End();
+}
+
+String::iterator& String::begin(){
+    return Data.Begin();
+}
+
+String::iterator& String::end(){
+    return Data.End();
 }
 
 char& String::operator[](ui pos){
@@ -74,37 +152,39 @@ const char& String::operator[](ui pos)const{
     return Data[pos];
 }
 
-void String::operator<<(std::ostream& o){
-    for(char c:Data)o<<c;
-}
-
-void String::operator>>(std::istream& o){
-    char tmp;
-    Data.Clear();
-    while(true){
-        tmp=o.get();
-        if(tmp==' '||tmp=='\n'||tmp==EOF)break;
-        Data.PushBack(tmp);
-    }
-}
-
 String String::operator+(const String& str){
+    String tmp(*this);
     ui old_size=this->Size();
     ui new_size=this->Size()+str.Size();
-    Data.Resize(new_size);
+    tmp.Resize(new_size);
     for(ui p=old_size;p<new_size;p++)
-        Data[p]=str[p-old_size];
-    return *this;
+        tmp[p]=str[p-old_size];
+    return tmp;
 }
 
 String String::operator+(const char c){
-    this->Append(c);
-    return *this;
+    String tmp(*this);
+    tmp.Append(c);
+    return tmp;
+}
+
+String String::operator+(const char* p){
+    return *this+String(p);
 }
 
 String String::operator+=(const String& str){
     String tmp=*this+str;
     return *this=tmp;
+}
+
+String String::operator+=(const char& c){
+    this->Append(c);
+    return *this;
+}
+
+String String::operator+=(char* p){
+    String str=*this+p;
+    return *this=str;
 }
 
 bool String::operator==(const String& str){
@@ -157,8 +237,55 @@ bool String::operator>(const String& str){
     }
 }
 
+std::istream& operator>>(std::istream& o, String& str){
+    char tmp;
+    str.Clear();
+    while(true){
+        tmp=o.get();
+        if(tmp==' '||tmp=='\n'||tmp==EOF)break;
+        str.PushBack(tmp);
+    }
+    return o;
+}
+
+std::ostream& operator<<(std::ostream& o, const String& str){
+    for(char c:str)o<<c;
+    return o;
+}
+
 String operator+(const char c, const String& str){
     String tmp(str);
     tmp.Insert(tmp.Begin(), c);
     return tmp;
+}
+
+String operator+(const char* p, const String& str){
+    return String(p)+str;
+}
+
+String ToString(long long num){
+    String ans;
+    bool sign=true;
+    if(num<0)sign=false;
+    while(num){
+        ans.PushBack(char(num%10+'0'));
+        num/=10;
+    }
+    std::reverse(ans.Begin(), ans.End());
+    return (sign?"-":"")+ans;
+}
+
+long long ToDigit(String str){
+    long long num=0;
+    bool sign=false;
+    ui p=0;
+    if(str[p]=='-'){
+        sign=true;
+        p++;
+    }
+    while(p<str.Size()){
+        assert(std::isdigit(str[p]));
+        num=num*10+str[p++]-'0';
+    }
+    return (sign?-1:1)*num;
 }
