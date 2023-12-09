@@ -151,7 +151,7 @@ const T& Vector<T>::operator[](ui pos)const{
 
 template<class T>
 Vector<T>::~Vector(){
-    delete []Start;
+    if(Start!=nullptr)delete []Start;
     Start=Finish=EndOfStorage=nullptr;
 }
 
@@ -173,6 +173,7 @@ bool Vector<T>::Empty()const{
 template<class T>
 void Vector<T>::Clear(){
     Finish=Start;
+    Rfinish=Rstart;
 }
 
 template<class T>

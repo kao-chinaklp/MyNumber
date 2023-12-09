@@ -10,7 +10,6 @@ int main(){
     while(true){
         cin>>in;
         num1=in;
-        cout<<num1.Str()<<endl;
         cin>>in;
         num2=in;
         auto res=num1*num2;

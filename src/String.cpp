@@ -2,20 +2,29 @@
 
 #include <algorithm>
 
+ui Strlen(const char* p){
+    ui cnt=0;
+    while(*p!='\0')++cnt, ++p;
+    return cnt;
+}
+
 String::String(const char* init){
-    ui size=sizeof(init);
-    Data.Resize(size);Data.ShrinkToFit();
+    ui size=Strlen(init);
+    Data.Resize(size);
     for(ui i=0;i<size;i++)
         Data[i]=init[i];
 }
 
 String::String(const String& init){
-    Data=init.Data;
+    ui size=init.Size();
+    Data.Resize(size);
+    for(ui i=0;i<size;i++)
+        Data[i]=init[i];
 }
 
 String::String(String::iterator _start, String::iterator _end){
     ui size=_end-_start;
-    Data.Resize(size);Data.ShrinkToFit();
+    Data.Resize(size);
     for(ui i=0;i<size;i++)
         Data[i]=_start[i];
 }

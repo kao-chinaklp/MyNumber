@@ -110,8 +110,6 @@ void MyNumber::RemoveLeadingZero(){
         this->Number.PopBack();
 }
 
-#include <iostream>
-
 String MyNumber::Str(){
     this->RemoveLeadingZero();
     String out="";
@@ -121,7 +119,6 @@ String MyNumber::Str(){
         out=tmp+out;
     }
     if(this->Sign&&out!="0")out.Insert(out.begin(), '-');
-    std::cout<<out<<std::endl;
     return out;
 }
 
