@@ -45,14 +45,16 @@ class String{
         Vector<char>::reverseIterator& Rbegin();
         Vector<char>::reverseIterator& Rend();
         
+        String& operator=(const String& str);
+        String& operator=(String&& str)noexcept;
         char& operator[](ui pos);
         const char& operator[](ui pos)const;
         String operator+(const String& str);
         String operator+(const char c);
         String operator+(const char* p);
-        String operator+=(const String& str);
-        String operator+=(const char& c);
-        String operator+=(char* p);
+        String& operator+=(const String& str);
+        String& operator+=(const char& c);
+        String& operator+=(char* p);
         bool operator==(const String& str);
         bool operator!=(const String& str);
         bool operator<(const String& str);

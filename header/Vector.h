@@ -30,18 +30,21 @@ class Vector{
             reverseIterator operator-=(const long long num){return rIt+=num;}
             bool operator==(const reverseIterator& it)const{return rIt==it.rIt;}
             bool operator!=(const reverseIterator& it)const{return rIt!=it.rIt;}
-            T& operator*(const reverseIterator&);
+            friend T& operator*(const reverseIterator&);
 
             Vector<T>::iterator rIt;
         };
 
-        Vector();
+        Vector():Vector(1){};
         Vector(ui size, const T val=0);
         Vector(int size, const T val=0);
         Vector(const iterator _start, const iterator _end);
         Vector(const Vector<T>& x);
+        Vector(Vector<T>&& x)noexcept;
         ~Vector();
 
+        Vector<T>& operator=(const Vector<T>& x);
+        Vector<T>& operator=(Vector<T>&& x)noexcept;
         T& operator[](ui pos);
         const T& operator[](ui pos)const;
 
@@ -90,8 +93,8 @@ class Vector{
 };
 
 template<class T>
-Vector<T>::Vector(){
-    Rstart=Rfinish=Start=Finish=EndOfStorage=nullptr;
+T& operator*(const typename Vector<T>::reverseIterator& x){
+    return *(x.rIt);
 }
 
 template<class T>
@@ -138,7 +141,37 @@ Vector<T>::Vector(const Vector<T>& x){
 }
 
 template<class T>
-T& Vector<T>::operator[](ui pos){
+Vector<T>::Vector(Vector<T>&& x)noexcept{
+    this->Start=x.Start;x.Start=nullptr;
+    this->Finish=x.Finish;x.Finish=nullptr;
+    this->EndOfStorage=x.EndOfStorage;x.EndOfStorage=nullptr;
+    this->Rbegin=x.Rbegin;x.Rbegin=nullptr;
+    this->Rend=x.Rend;x.Rend=nullptr;
+}
+
+template <class T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& x){
+    this->Start=x.Start;
+    this->Finish=x.Finish;
+    this->EndOfStorage=x.EndOfStorage;
+    this->Rstart=x.Rstart;
+    this->Rfinish=x.Rfinish;
+    return *this;
+}
+
+template <class T>
+Vector<T>& Vector<T>::operator=(Vector<T>&& x)noexcept{
+    this->Start=x.Start;x.Start=nullptr;
+    this->Finish=x.Finish;x.Finish=nullptr;
+    this->EndOfStorage=x.EndOfStorage;x.EndOfStorage=nullptr;
+    this->Rstart=x.Rstart;x.Rstart=nullptr;
+    this->Rfinish=x.Rfinish;x.Rfinish=nullptr;
+    return *this;
+}
+
+template <class T>
+T &Vector<T>::operator[](ui pos)
+{
     assert(pos<Size());
     return Start[pos];
 }

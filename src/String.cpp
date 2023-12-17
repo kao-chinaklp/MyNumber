@@ -34,7 +34,12 @@ String::~String(){
     Data.ShrinkToFit();
 }
 
-ui String::Find(const char c, const ui pos){
+void String::Assign(const ui size, const char &c){
+    Data.Assign(size, c);
+}
+
+ui String::Find(const char c, const ui pos)
+{
     for(ui p=pos;p<this->Size();p++)
         if(c==Data[p])return p;
     return -1;
@@ -161,6 +166,16 @@ const char& String::operator[](ui pos)const{
     return Data[pos];
 }
 
+String& String::operator=(const String& str){
+    Data=str.Data;
+    return *this;
+}
+
+String& String::operator=(String&& str)noexcept{
+    Data=str.Data;str="";
+    return *this;
+}
+
 String String::operator+(const String& str){
     String tmp(*this);
     ui old_size=this->Size();
@@ -181,19 +196,19 @@ String String::operator+(const char* p){
     return *this+String(p);
 }
 
-String String::operator+=(const String& str){
-    String tmp=*this+str;
-    return *this=tmp;
+String& String::operator+=(const String& str){
+    this->Append(str);
+    return *this;
 }
 
-String String::operator+=(const char& c){
+String& String::operator+=(const char& c){
     this->Append(c);
     return *this;
 }
 
-String String::operator+=(char* p){
-    String str=*this+p;
-    return *this=str;
+String& String::operator+=(char* p){
+    this->Append(p);
+    return *this;
 }
 
 bool String::operator==(const String& str){
