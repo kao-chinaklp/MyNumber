@@ -1,5 +1,6 @@
 #include "MyNumber.h"
 
+#include <iostream>
 #include <algorithm>
 
 using std::ceil, std::reverse, std::max;
@@ -112,13 +113,13 @@ void MyNumber::RemoveLeadingZero(){
 
 String MyNumber::Str(){
     this->RemoveLeadingZero();
-    String out="";
+    String out;
     for(int p=0, len=this->GetSize();p<len;p++){
         String tmp=ToString(this->Number[p]);
         if(p<len-1)while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
         out=tmp+out;
     }
-    if(this->Sign&&out!="0")out.Insert(out.begin(), '-');
+    if(this->Sign&&out!="0")out.Insert(out.Begin(), '-');
     return out;
 }
 
@@ -320,10 +321,12 @@ MyNumber MyNumber::operator*(MyNumber num){
     Vector<ui> num1, num2;
     String str=this->Str();
     ui len1=str.Size();
-    for(char& c:str)num1.PushBack(c-48);
+    for(Vector<char>::reverseIterator p=str.Rbegin();p!=str.Rend();p++)
+        num1.PushBack(*p-48);
     str=num.Str();
     ui len2=str.Size();
-    for(char& c:str)num2.PushBack(c-48);
+    for(Vector<char>::reverseIterator p=str.Rbegin();p!=str.Rend();p++)
+        num2.PushBack(*p-48);
     ui len=1, l=0;
     while(len<len1+len2)len<<=1, l++;
     num1.Resize(len), num2.Resize(len);
@@ -331,7 +334,7 @@ MyNumber MyNumber::operator*(MyNumber num){
     NTT(num1, len, 1);
     NTT(num2, len, 1);
     for(ui i=0;i<len;i++)
-        num1[i]=1ll*num1[i]*num2[i]%mod;
+        num1[i]=1ull*num1[i]*num2[i]%mod;
     NTT(num1, len, 0);
     ll inv=FastPow(len, mod-2);// Inverse
     for(ui i=0;i<len;i++){
@@ -348,9 +351,9 @@ MyNumber MyNumber::operator*(MyNumber num){
     }
     while(len>1&&num1[len-1]==0)--len;
     str.Clear();
-    for(ui i=len-1;i>=0;i--)
-        str.PushBack(char(num1[i]));
-    return MyNumber(str);
+    for(ui i=len-1;i!=-1;i--)
+        str.PushBack(char(num1[i]+'0'));
+    return MyNumber((flag?"":"-")+str);
     // This part of FFT was replaced by NTT
     // 
     // Vector<Complex> ans, num1, num2;

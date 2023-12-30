@@ -158,6 +158,14 @@ String::iterator& String::end(){
     return Data.End();
 }
 
+Vector<char>::reverseIterator& String::Rbegin(){
+    return Data.Rbegin();
+}
+
+Vector<char>::reverseIterator& String::Rend(){
+    return Data.Rend();
+}
+
 char& String::operator[](ui pos){
     return Data[pos];
 }
@@ -172,7 +180,8 @@ String& String::operator=(const String& str){
 }
 
 String& String::operator=(String&& str)noexcept{
-    Data=str.Data;str="";
+    Data=str.Data;
+    str.Data.Clear();
     return *this;
 }
 
@@ -288,6 +297,7 @@ String operator+(const char* p, const String& str){
 }
 
 String ToString(long long num){
+    if(num==0)return String("0");
     String ans;
     bool sign=true;
     if(num<0)sign=false;
@@ -296,7 +306,7 @@ String ToString(long long num){
         num/=10;
     }
     std::reverse(ans.Begin(), ans.End());
-    return (sign?"-":"")+ans;
+    return (sign?"":"-")+ans;
 }
 
 long long ToDigit(String str){
@@ -308,6 +318,7 @@ long long ToDigit(String str){
         p++;
     }
     while(p<str.Size()){
+        auto tmp=str[p];
         assert(std::isdigit(str[p]));
         num=num*10+str[p++]-'0';
     }

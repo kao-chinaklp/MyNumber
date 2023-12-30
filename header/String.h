@@ -10,7 +10,7 @@ class String{
         typedef char* iterator;
         
     public:
-        String()=default;
+        String():String(""){};
         String(const char* init);
         String(const String& init);
         String(iterator _start, iterator _end);
