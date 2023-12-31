@@ -362,14 +362,8 @@ MyNumber MyNumber::operator/(ll num){
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
-    // To do ...
-    // MyNumber ans(*this), x0(1);
-    // ui times=max(1, int(ceil(num.CountBits()/0.301)));
-    // for(int i=1;i<=times;i++){
-    //     x0*=2-num*x0;
-    //     printf("%s\n",x0.Str().c_str());
-    // }
-    // return ans*x0;
+    // To Do
+    // 算了懒得写了，留到明年吧（刨大坑）2023.12.31 23:55
     return MyNumber(0);
 }
 
@@ -421,7 +415,7 @@ void MyNumber::NTTInit(ui len, ui Size){
         rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
 }
 
-void MyNumber::NTT(Vector<ui>& arr, int n, int inv){
+void MyNumber::NTT(Vector<ui>& arr, ui n, int inv){
     for(ui i=0;i<n;i++)
         if(i<rev[i])swap(arr[i], arr[rev[i]]);
     for(ui i=1;i<n;i<<=1){
@@ -435,6 +429,27 @@ void MyNumber::NTT(Vector<ui>& arr, int n, int inv){
             }
         }
     }
+}
+
+void MyNumber::Inverse(MyNumber& num1, MyNumber& num2, ui size){
+    if(size==0)size=this->GetSize();
+    if(size==1){
+        num2[0]=FastPow(num1[0], mod-2);
+        return;
+    }
+    MyNumber tmp;
+    Inverse(num1, num2, (size+1)/2);
+    ui len=1, l=0;
+    while(len<size*2)len<<=1, l++;
+    for(ui i=0;i<=len;i++)
+        tmp[i]=(i>=size?0:num1[i]);
+    NTTInit(len, l);
+    NTT(tmp.Number, len, 1);
+    NTT(num2.Number, len, 1);
+    for(ui i=0;i<=len;i++)
+        num2[i]=(1ull*num2[i]*2%mod-1ull*num2[i]*num2[i]%mod*tmp[i]%mod+mod)%mod;
+    NTT(num2.Number, len, 0);
+    for(ui i=size;i<=len;i++)num2[i]=0;
 }
 
 ui MyNumber::CountBits(){

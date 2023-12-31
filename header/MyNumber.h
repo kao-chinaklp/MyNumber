@@ -76,7 +76,8 @@ class MyNumber{
         Vector<ui> rev;
         ll FastPow(ll num, ll idx);
         void NTTInit(ui len, ui size);
-        void NTT(Vector<ui>& arr, int n, int inv);
+        void NTT(Vector<ui>& arr, ui n, int inv);
+        void Inverse(MyNumber& num1, MyNumber& num2, ui size=0);
         ui CountBits();
 };
 
