@@ -96,7 +96,7 @@ class Vector{
 };
 
 template<class T>
-void Reverse(typename Vector<T>::iterator& first, typename Vector<T>::iterator& last){
+void Reverse(typename Vector<T>::iterator first, typename Vector<T>::iterator last){
     while((first!=last)&&(first!=--last)){
         swap(first, last);
         ++first;
