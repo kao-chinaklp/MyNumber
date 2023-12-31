@@ -314,10 +314,3 @@ long long ToDigit(String str){
     }
     return (sign?-1:1)*num;
 }
-
-void Reverse(String::iterator first, String::iterator last){
-    while((first!=last)&&(first!=--last)){
-        swap(first, last);
-        ++first;
-    }
-}

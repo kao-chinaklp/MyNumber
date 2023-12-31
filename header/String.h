@@ -69,6 +69,5 @@ String operator+(const char* p, const String& str);
 
 String ToString(long long num);
 long long ToDigit(String str);
-void Reverse(String::iterator first, String::iterator last);
 
 #endif

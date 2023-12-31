@@ -3,13 +3,10 @@
 #define ui unsigned int
 #define ll long long
 
+#include "String.h"
 #include "Vector.h"
-#include "Complex.h"
-
-#include <cmath>
 
 const ui Lim=int(1e9);
-const double eps=0.49, pi=acos(-1.0);
 
 class MyNumber{
     public:
@@ -78,9 +75,7 @@ class MyNumber{
         Vector<ui> Number;
         Vector<ui> rev;
         ll FastPow(ll num, ll idx);
-        void FFTInit(ui len, ui size);
         void NTTInit(ui len, ui size);
-        void FFT(Vector<Complex>& arr, int n, int inv);
         void NTT(Vector<ui>& arr, int n, int inv);
         ui CountBits();
 };

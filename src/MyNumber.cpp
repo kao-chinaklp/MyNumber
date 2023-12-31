@@ -1,6 +1,10 @@
 #include "MyNumber.h"
 
-using std::ceil, std::max;
+using std::max;
+
+ll inline ceil(long double num){
+    return num-static_cast<ll>(num)>0?static_cast<ll>(num):static_cast<ll>(num);
+}
 
 MyNumber::MyNumber(ll num){
     this->jump=false;
@@ -411,32 +415,10 @@ ll MyNumber::FastPow(ll num, ll idx){
     return res;
 }
 
-void MyNumber::FFTInit(ui len, ui Size){
-    rev.Resize(len);
-    for(ui i=0;i<len;i++)
-        rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
-}
-
 void MyNumber::NTTInit(ui len, ui Size){
     rev.Resize(len);
     for(ui i=0;i<len;i++)
         rev[i]=(rev[i>>1]>>1)|((i&1)<<(Size-1));
-}
-
-void MyNumber::FFT(Vector<Complex>& arr, int n, int inv){
-    for(ui i=0;i<n;i++)
-        if(i<rev[i])swap(arr[i], arr[rev[i]]);
-    for(ui i=1;i<n;i<<=1){
-        Complex wn(cos(pi/i), inv*sin(pi/i));
-        for(ui j=0;j<n;j+=(i<<1)){
-            Complex w0(1,0);
-            for(ui k=0;k<i;k++, w0*=wn){
-                Complex x=arr[j+k], y=w0*arr[i+j+k];
-                arr[j+k]=x+y;
-                arr[i+j+k]=x-y;
-            }
-        }
-    }
 }
 
 void MyNumber::NTT(Vector<ui>& arr, int n, int inv){

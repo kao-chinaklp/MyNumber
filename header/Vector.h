@@ -95,8 +95,8 @@ class Vector{
         reverseIterator Rfinish;
 };
 
-template<typename T, template<typename T> class Vector=Vector>
-void Reverse(typename Vector<T>::iterator first, typename Vector<T>::iterator last){
+template<typename iterator>
+void Reverse(iterator first, iterator last){
     while((first!=last)&&(first!=--last)){
         swap(first, last);
         ++first;
