@@ -20,6 +20,8 @@ class String{
         ui Find(const char c, const ui pos=0);
         ui Find(const String str, const ui pos=0);
         ui Size()const;
+        char& Front();
+        char& Back();
 
         void PushBack(const char c);
         void PopBack();

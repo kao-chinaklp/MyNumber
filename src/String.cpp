@@ -67,6 +67,14 @@ ui String::Size()const{
     return Data.Size();
 }
 
+inline char& String::Front(){
+    return Data.Front();
+}
+
+inline char& String::Back(){
+    return Data.Back();
+}
+
 void String::PushBack(const char c){
     this->Append(c);
 }

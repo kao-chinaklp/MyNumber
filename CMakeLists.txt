@@ -16,7 +16,7 @@ add_executable(MyNumber ${SOURCES})
 set(CMAKE_AR gcc-ar)
 set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static-libstdc++ -static-libgcc")
 
-target_compile_options(MyNumber PRIVATE -fdiagnostics-color=always -pedantic -flto -s -O3)
+target_compile_options(MyNumber PRIVATE -fdiagnostics-color=always -pedantic)
 
 # add curl
 target_include_directories(MyNumber PRIVATE ${CMAKE_SOURCE_DIR}/header)

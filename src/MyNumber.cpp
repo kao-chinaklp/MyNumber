@@ -3,7 +3,7 @@
 using std::max;
 
 ll inline ceil(long double num){
-    return num-static_cast<ll>(num)>0?static_cast<ll>(num):static_cast<ll>(num);
+    return num-static_cast<ll>(num)>0?static_cast<ll>(num+1):static_cast<ll>(num);
 }
 
 MyNumber::MyNumber(ll num){
@@ -67,9 +67,9 @@ MyNumber& MyNumber::operator=(String num){
     if(num[0]=='-')this->Sign=true,num.Erase(num.begin());
     else this->Sign=false;
     this->Number.Clear();
-    int tmp,cnt=num.Size()-1,bit;
+    int tmp, cnt=num.Size()-1, bit;
     const ui _size=num.Size();
-    for(ui i=0,len=ceil(_size/9.0);i<len;i++){
+    for(ui i=0, len=ceil(_size/9.0);i<len;i++){
         tmp=0, bit=1;
         while(bit!=Lim&&cnt>=0){
             tmp+=(num[cnt]-48)*bit;

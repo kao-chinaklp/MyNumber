@@ -98,7 +98,7 @@ class Vector{
 template<typename iterator>
 void Reverse(iterator first, iterator last){
     while((first!=last)&&(first!=--last)){
-        swap(first, last);
+        swap(*first, *last);
         ++first;
     }
 }
