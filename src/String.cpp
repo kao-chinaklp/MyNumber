@@ -1,7 +1,5 @@
 #include "String.h"
 
-#include <algorithm>
-
 ui Strlen(const char* p){
     ui cnt=0;
     while(*p!='\0')++cnt, ++p;
@@ -118,52 +116,44 @@ String String::Substr(const ui pos, const ui size){
     return res;
 }
 
-const String::iterator& String::Begin()const{
-    return Data.Begin();
+const String::iterator& String::cbegin()const{
+    return Data.cbegin();
 }
 
-const String::iterator& String::End()const{
-    return Data.End();
+const String::iterator& String::cend()const{
+    return Data.cend();
 }
 
 const String::iterator& String::begin()const{
-    return Data.Begin();
+    return Data.cbegin();
 }
 
 const String::iterator& String::end()const{
-    return Data.End();
+    return Data.cend();
 }
 
-const Vector<char>::reverseIterator& String::Rbegin()const{
-    return Data.Rbegin();
+const Vector<char>::reverseIterator& String::crbegin()const{
+    return Data.crbegin();
 }
 
-const Vector<char>::reverseIterator& String::Rend()const{
-    return Data.Rend();
-}
-
-String::iterator& String::Begin(){
-    return Data.Begin();
-}
-
-String::iterator& String::End(){
-    return Data.End();
+const Vector<char>::reverseIterator& String::crend()const{
+    return Data.crend();
 }
 
 String::iterator& String::begin(){
-    return Data.Begin();
+    return Data.begin();
 }
 
 String::iterator& String::end(){
-    return Data.End();
+    return Data.end();
 }
 
-Vector<char>::reverseIterator& String::Rbegin(){
-    return Data.Rbegin();
+Vector<char>::reverseIterator& String::rbegin(){
+    return Data.rbegin();
 }
 
-Vector<char>::reverseIterator& String::Rend(){
-    return Data.Rend();
+Vector<char>::reverseIterator& String::rend(){
+    return Data.rend();
 }
 
 char& String::operator[](ui pos){
@@ -288,7 +278,7 @@ std::ostream& operator<<(std::ostream& o, const String& str){
 
 String operator+(const char c, const String& str){
     String tmp(str);
-    tmp.Insert(tmp.Begin(), c);
+    tmp.Insert(tmp.begin(), c);
     return tmp;
 }
 
@@ -305,7 +295,7 @@ String ToString(long long num){
         ans.PushBack(char(num%10+'0'));
         num/=10;
     }
-    std::reverse(ans.Begin(), ans.End());
+    Reverse(ans.begin(), ans.end());
     return (sign?"":"-")+ans;
 }
 
@@ -323,4 +313,11 @@ long long ToDigit(String str){
         num=num*10+str[p++]-'0';
     }
     return (sign?-1:1)*num;
+}
+
+void Reverse(String::iterator first, String::iterator last){
+    while((first!=last)&&(first!=--last)){
+        swap(first, last);
+        ++first;
+    }
 }

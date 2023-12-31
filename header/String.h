@@ -32,18 +32,16 @@ class String{
         iterator Erase(iterator p);
         iterator Erase(const ui pos, const ui size);
         String Substr(const ui pos, const ui size);
-        const iterator& Begin()const;
-        const iterator& End()const;
+        const iterator& cbegin()const;
+        const iterator& cend()const;
         const iterator& begin()const;
         const iterator& end()const;
-        const Vector<char>::reverseIterator& Rbegin()const;
-        const Vector<char>::reverseIterator& Rend()const;
-        iterator& Begin();
-        iterator& End();
+        const Vector<char>::reverseIterator& crbegin()const;
+        const Vector<char>::reverseIterator& crend()const;
         iterator& begin();
         iterator& end();
-        Vector<char>::reverseIterator& Rbegin();
-        Vector<char>::reverseIterator& Rend();
+        Vector<char>::reverseIterator& rbegin();
+        Vector<char>::reverseIterator& rend();
         
         String& operator=(const String& str);
         String& operator=(String&& str)noexcept;
@@ -71,5 +69,6 @@ String operator+(const char* p, const String& str);
 
 String ToString(long long num);
 long long ToDigit(String str);
+void Reverse(String::iterator& first, String::iterator& last);
 
 #endif

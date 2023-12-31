@@ -1,9 +1,6 @@
 #include "MyNumber.h"
 
-#include <iostream>
-#include <algorithm>
-
-using std::ceil, std::reverse, std::max;
+using std::ceil, std::max;
 
 MyNumber::MyNumber(ll num){
     this->jump=false;
@@ -31,7 +28,7 @@ MyNumber::MyNumber(String num){
         tmp=num.Substr(i, std::min(9, len-i));
         this->Number.PushBack(ToDigit(tmp));
     }
-    reverse(this->Number.Begin(), this->Number.End());
+    Reverse(this->Number.begin(), this->Number.end());
 }
 
 MyNumber::MyNumber(MyNumber& num){
@@ -119,7 +116,7 @@ String MyNumber::Str(){
         if(p<len-1)while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
         out=tmp+out;
     }
-    if(this->Sign&&out!="0")out.Insert(out.Begin(), '-');
+    if(this->Sign&&out!="0")out.Insert(out.begin(), '-');
     return out;
 }
 
@@ -132,8 +129,8 @@ MyNumber MyNumber::operator++(){
         this->jump=true;
         return --(*this);
     }
-    auto iter=this->Number.Begin();
-    auto _End=this->Number.End();
+    auto iter=this->Number.begin();
+    auto _End=this->Number.end();
     ++(*iter);
     while((++iter)!=_End){
         if(*(iter-1)!=Lim)break;
@@ -166,8 +163,8 @@ MyNumber MyNumber::operator--(){
             return ++(*this);
         }
     }
-    auto iter=this->Number.Begin();
-    auto _End=this->Number.End();
+    auto iter=this->Number.begin();
+    auto _End=this->Number.end();
     --(*iter);
     while((++iter)!=_End){
         if(*(iter-1)<Lim)break;
@@ -321,11 +318,11 @@ MyNumber MyNumber::operator*(MyNumber num){
     Vector<ui> num1, num2;
     String str=this->Str();
     ui len1=str.Size();
-    for(Vector<char>::reverseIterator p=str.Rbegin();p!=str.Rend();p++)
+    for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();p++)
         num1.PushBack(*p-48);
     str=num.Str();
     ui len2=str.Size();
-    for(Vector<char>::reverseIterator p=str.Rbegin();p!=str.Rend();p++)
+    for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();p++)
         num2.PushBack(*p-48);
     ui len=1, l=0;
     while(len<len1+len2)len<<=1, l++;
@@ -354,47 +351,6 @@ MyNumber MyNumber::operator*(MyNumber num){
     for(ui i=len-1;i!=-1;i--)
         str.PushBack(char(num1[i]+'0'));
     return MyNumber((flag?"":"-")+str);
-    // This part of FFT was replaced by NTT
-    // 
-    // Vector<Complex> ans, num1, num2;
-    // Vector<ui> res;
-    // String str=this->Str();
-    // int len1=str.Size();
-    // for(auto i=str.Rbegin();i!=str.Rend();i++)
-    //     num1.PushBack(Complex(double(*i-48)));
-    // str=num.Str();
-    // int len2=str.Size();
-    // for(auto i=str.Rbegin();i!=str.Rend();i++)
-    //     num2.PushBack(Complex(double(*i-48)));
-    // int len=1, l=0;
-    // while(len<len1+len2)len<<=1,l++;
-    // ans.Resize(len);
-    // res.Resize(len);
-    // num1.Resize(len), num2.Resize(len);
-    // FFTInit(len, l);
-    // FFT(num1, len, 1);
-    // FFT(num2, len, 1);
-    // for(int i=0;i<len;i++)
-    //     ans[i]=num1[i]*num2[i];
-    // FFT(ans, len, -1);
-    // for(int i=0;i<len;i++){
-    //     res[i]+=ans[i].Real()/len+eps;
-    //     if(i<len-1){
-    //         res[i+1]+=res[i]/10;
-    //         res[i]%=10;
-    //     }
-    // }
-    // while(res[len-1]==0&&len>1)len--;
-    // while(res[len-1]>9){
-    //     res.PushBack(res[len-1]/10);
-    //     res[len-1]%=10;
-    //     len++;
-    // }
-    // while(len>0&&res[len-1]==0)len--;
-    // str.Clear();
-    // for(int i=len-1;i>=0;i--)
-    //     str.PushBack(res[i]+48);
-    // return MyNumber((flag?"":"-")+str);
 }
 
 MyNumber MyNumber::operator/(ll num){

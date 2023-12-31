@@ -56,19 +56,17 @@ class Vector{
         bool Empty();
         bool Empty()const;
         void Clear();
-        const iterator& Begin()const;
-        const iterator& End()const;
         const iterator& EOS()const;
+        const iterator& cbegin()const;
+        const iterator& cend()const;
         const iterator& begin()const;
         const iterator& end()const;
-        const reverseIterator& Rbegin()const;
-        const reverseIterator& Rend()const;
-        iterator& Begin();
-        iterator& End();
+        const reverseIterator& crbegin()const;
+        const reverseIterator& crend()const;
         iterator& begin();
         iterator& end();
-        reverseIterator& Rbegin();
-        reverseIterator& Rend();
+        reverseIterator& rbegin();
+        reverseIterator& rend();
         T& Front();
         T& Back();
 
@@ -96,6 +94,14 @@ class Vector{
         reverseIterator Rstart;
         reverseIterator Rfinish;
 };
+
+template<class T>
+void Reverse(typename Vector<T>::iterator& first, typename Vector<T>::iterator& last){
+    while((first!=last)&&(first!=--last)){
+        swap(first, last);
+        ++first;
+    }
+}
 
 template<class T>
 Vector<T>::Vector(ui size, const T val){
@@ -128,8 +134,8 @@ Vector<T>::Vector(const iterator _start, const iterator _end){
         PushBack(*_start);
         ++_start;
     }
-    Rstart=End()-1;
-    Rfinish=Begin()-1;
+    Rstart=end()-1;
+    Rfinish=begin()-1;
 }
 
 template<class T>
@@ -219,18 +225,18 @@ void Vector<T>::Clear(){
 }
 
 template<class T>
-const typename Vector<T>::iterator& Vector<T>::Begin()const{
+const typename Vector<T>::iterator& Vector<T>::EOS()const{
+    return EndOfStorage;
+}
+
+template<class T>
+const typename Vector<T>::iterator& Vector<T>::cbegin()const{
     return Start;
 }
 
 template<class T>
-const typename Vector<T>::iterator& Vector<T>::End()const{
+const typename Vector<T>::iterator& Vector<T>::cend()const{
     return Finish;
-}
-
-template<class T>
-const typename Vector<T>::iterator& Vector<T>::EOS()const{
-    return EndOfStorage;
 }
 
 template<class T>
@@ -244,23 +250,13 @@ const typename Vector<T>::iterator& Vector<T>::end()const{
 }
 
 template<class T>
-const typename Vector<T>::reverseIterator& Vector<T>::Rbegin()const{
+const typename Vector<T>::reverseIterator& Vector<T>::crbegin()const{
     return Rstart;
 }
 
 template<class T>
-const typename Vector<T>::reverseIterator& Vector<T>::Rend()const{
+const typename Vector<T>::reverseIterator& Vector<T>::crend()const{
     return Rfinish;
-}
-
-template<class T>
-typename Vector<T>::iterator& Vector<T>::Begin(){
-    return Start;
-}
-
-template<class T>
-typename Vector<T>::iterator& Vector<T>::End(){
-    return Finish;
 }
 
 template<class T>
@@ -274,12 +270,12 @@ typename Vector<T>::iterator& Vector<T>::end(){
 }
 
 template<class T>
-typename Vector<T>::reverseIterator& Vector<T>::Rbegin(){
+typename Vector<T>::reverseIterator& Vector<T>::rbegin(){
     return Rstart;
 }
 
 template<class T>
-typename Vector<T>::reverseIterator& Vector<T>::Rend(){
+typename Vector<T>::reverseIterator& Vector<T>::rend(){
     return Rfinish;
 }
 
@@ -316,13 +312,13 @@ void Vector<T>::PushBack(const T& val){
         IsInit=false;
         Clear();
     }
-    Insert(End(), val);
+    Insert(end(), val);
 }
 
 template<class T>
 void Vector<T>::PopBack(){
     assert(Size());
-    Erase(End()-1);
+    Erase(end()-1);
 }
 
 template<class T>
