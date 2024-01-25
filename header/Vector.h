@@ -1,8 +1,9 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
-#define ui unsigned int
 
 #include <assert.h>
+
+typedef unsigned int ui;
 
 template<class T>
 void inline swap(T& a, T& b){

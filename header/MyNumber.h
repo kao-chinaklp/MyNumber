@@ -1,12 +1,12 @@
 #ifndef MYNUMBER_H_
 #define MYNUMBER_H_
-#define ui unsigned int
-#define ll long long
+typedef long long ll;
+typedef unsigned long long ull;
 
 #include "String.h"
 #include "Vector.h"
 
-const ui Lim=int(1e9);
+const ui Lim=ui(1e9);
 
 class MyNumber{
     public:
@@ -14,39 +14,36 @@ class MyNumber{
         MyNumber(ll num);
         MyNumber(String num);
         MyNumber(MyNumber& num);
+        MyNumber(MyNumber&& num)noexcept;
         MyNumber& operator=(ll num);
         MyNumber& operator=(String num);
-        MyNumber& operator=(MyNumber num);
+        MyNumber& operator=(MyNumber& num);
+        MyNumber& operator=(MyNumber&& num)noexcept;
 
     public:
         ~MyNumber();
-        bool GetSign()const;
-        void SetSign(bool Sign);
-        ui GetSize()const;
-        void SetSize(ui new_size);
-        Vector<ui> GetNumber();
-        void RemoveLeadingZero();
         String Str();
 
     public:
-        ui& operator[](ui idx);
+        ui& operator[](const ui idx);
+        const ui& operator[](const ui idx)const;
         MyNumber operator++();
         MyNumber operator++(int);
         MyNumber operator--();
         MyNumber operator--(int);
         MyNumber operator-();
         bool operator==(ll num);
-        bool operator==(MyNumber num);
+        bool operator==(const MyNumber& num);
         bool operator!=(ll num);
-        bool operator!=(MyNumber num);
+        bool operator!=(const MyNumber& num);
         bool operator<(ll num);
-        bool operator<(MyNumber num);
+        bool operator<(const MyNumber& num);
         bool operator>(ll num);
-        bool operator>(MyNumber num);
+        bool operator>(const MyNumber& num);
         bool operator<=(ll num);
-        bool operator<=(MyNumber num);
+        bool operator<=(const MyNumber& num);
         bool operator>=(ll num);
-        bool operator>=(MyNumber num);
+        bool operator>=(const MyNumber& num);
         bool jump;
 
     public:
@@ -67,6 +64,18 @@ class MyNumber{
         MyNumber operator*=(MyNumber num);
         MyNumber operator/=(ll num);
         MyNumber operator/=(MyNumber num);
+        friend MyNumber operator+=(ll& num1, MyNumber num2);
+        friend MyNumber operator-=(ll& num1, MyNumber num2);
+        friend MyNumber operator*=(ll& num1, MyNumber num2);
+        friend MyNumber operator/=(ll& num1, MyNumber num2);
+
+    protected:
+        bool GetSign()const;
+        void SetSign(bool Sign);
+        ui GetSize()const;
+        void SetSize(ui new_size);
+        Vector<ui> GetNumber();
+        void RemoveLeadingZero();
 
     private:
         const ui mod=998244353;

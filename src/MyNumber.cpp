@@ -1,6 +1,14 @@
 #include "MyNumber.h"
 
-using std::max;
+template<class T>
+T max(const T& a, const T& b){
+    return (a>b?a:b);
+}
+
+template<class T>
+T min(const T& a, const T& b){
+    return (a<b?a:b);
+}
 
 ll inline ceil(long double num){
     return num-static_cast<ll>(num)>0?static_cast<ll>(num+1):static_cast<ll>(num);
@@ -39,6 +47,12 @@ MyNumber::MyNumber(MyNumber& num){
     this->jump=false;
     this->Sign=num.GetSign();
     this->Number=Vector<ui>(num.GetNumber());
+}
+
+MyNumber::MyNumber(MyNumber&& num)noexcept{
+    this->jump=num.jump=false;
+    this->Sign=num.GetSign();num.SetSign(false);
+    this->Number=Vector<ui>(num.GetNumber());num.Number.Clear();
 }
 
 MyNumber::~MyNumber(){
@@ -81,9 +95,16 @@ MyNumber& MyNumber::operator=(String num){
     return *this;
 }
 
-MyNumber& MyNumber::operator=(MyNumber num){
+MyNumber& MyNumber::operator=(MyNumber& num){
     this->Sign=num.GetSign();
     this->Number=Vector<ui>(num.GetNumber());
+    return *this;
+}
+
+MyNumber& MyNumber::operator=(MyNumber&& num)noexcept{
+    this->jump=num.jump=false;
+    this->Sign=num.GetSign();num.SetSign(false);
+    this->Number=Vector<ui>(num.GetNumber());num.Number.Clear();
     return *this;
 }
 
@@ -124,7 +145,11 @@ String MyNumber::Str(){
     return out;
 }
 
-ui& MyNumber::operator[](ui idx){
+ui& MyNumber::operator[](const ui idx){
+    return this->Number[idx];
+}
+
+const ui& MyNumber::operator[](const ui idx)const{
     return this->Number[idx];
 }
 
@@ -197,10 +222,14 @@ MyNumber MyNumber::operator-(){
 }
 
 bool MyNumber::operator==(ll num){
-    return (*this)==MyNumber(num);
+    if(this->GetSign()==true&&num>=0||
+       this->GetSign()==false&&num<0)return false;
+    if(this->GetSize()>1)return false;
+    if(num<0)num=-num;
+    return (*this)[0]==num;
 }
 
-bool MyNumber::operator==(MyNumber num){
+bool MyNumber::operator==(const MyNumber& num){
     if(this->GetSize()!=num.GetSize()||this->GetSign()!=num.GetSign())
         return false;
     for(int i=0,len=this->GetSize();i<len;i++)
@@ -209,23 +238,35 @@ bool MyNumber::operator==(MyNumber num){
 }
 
 bool MyNumber::operator!=(ll num){
-    MyNumber tmp(num);
-    return !((*this)==tmp);
+    if(this->GetSign()==false&&num>=0||
+       this->GetSign()==true&&num<0)return false;
+    if(this->GetSize()>1)return true;
+    if(num<0)num=-num;
+    return (*this)[0]!=num;
 }
 
-bool MyNumber::operator!=(MyNumber num){
+bool MyNumber::operator!=(const MyNumber& num){
     return !((*this)==num);
 }
 
 bool MyNumber::operator<(ll num){
-    return *this<MyNumber(num);
+    if(this->GetSign()==true&&num>=0)return true;
+    if(this->GetSign()==false&&num<=0)return false;
+    if(num<0){
+        num=-num;
+        if(this->GetSize()>1)return true;
+        else return (*this)[0]>num;
+    }
+    else
+        if(this->GetSize()>1)return false;
+        else return (*this)[0]<num;
 }
 
-bool MyNumber::operator<(MyNumber num){
+bool MyNumber::operator<(const MyNumber& num){
     if(this->Sign!=num.GetSign())return this->GetSign();
     if(this->GetSize()<num.GetSize())return true;
     if(this->GetSize()>num.GetSize())return false;
-    for(int i=0,len=this->GetSize();i<len;i++){
+    for(int i=0, len=this->GetSize();i<len;i++){
         if((*this)[i]<num[i])return true;
         if((*this)[i]>num[i])return false;
     }
@@ -233,14 +274,23 @@ bool MyNumber::operator<(MyNumber num){
 }
 
 bool MyNumber::operator>(ll num){
-    return *this<MyNumber(num);
+    if(this->GetSign()==true&&num>=0)return false;
+    if(this->GetSign()==false&&num<0)return true;
+    if(num<0){
+        num=-num;
+        if(this->GetSize()>1)return false;
+        else return (*this)[0]<num;
+    }
+    else 
+        if(this->GetSize()>1)return true;
+        else return (*this)[0]>num;
 }
 
-bool MyNumber::operator>(MyNumber num){
+bool MyNumber::operator>(const MyNumber& num){
     if(this->Sign!=num.GetSign())return !this->GetSign();
     if(this->GetSize()>num.GetSize())return true;
     if(this->GetSize()<num.GetSize())return false;
-    for(int i=0,len=this->GetSize();i<len;i++){
+    for(int i=0, len=this->GetSize();i<len;i++){
         if((*this)[i]>num[i])return true;
         if((*this)[i]<num[i])return false;
     }
@@ -251,7 +301,7 @@ bool MyNumber::operator<=(ll num){
     return !(*this>num);
 }
 
-bool MyNumber::operator<=(MyNumber num){
+bool MyNumber::operator<=(const MyNumber& num){
     return !(*this>num);
 }
 
@@ -259,7 +309,7 @@ bool MyNumber::operator>=(ll num){
     return !(*this<num);
 }
 
-bool MyNumber::operator>=(MyNumber num){
+bool MyNumber::operator>=(const MyNumber& num){
     return !(*this<num);
 }
 
@@ -271,7 +321,7 @@ MyNumber MyNumber::operator+(MyNumber num){
     MyNumber tmp(*this), ans=0;
     if(num.GetSign())return tmp-(-num);
     else if(tmp.GetSign())return num-(-tmp);
-    ui new_size=max(tmp.GetSize(),num.GetSize());
+    ui new_size=max(tmp.GetSize(), num.GetSize());
     ans.SetSize(new_size+1);
     tmp.SetSize(new_size);
     num.SetSize(new_size);
@@ -296,7 +346,7 @@ MyNumber MyNumber::operator-(MyNumber num){
         swap(tmp, num);
         ans.SetSign(true);
     }
-    ui new_size=max(tmp.GetSize(),num.GetSize());
+    ui new_size=max(tmp.GetSize(), num.GetSize());
     ans.SetSize(new_size+1);
     tmp.SetSize(new_size);
     num.SetSize(new_size);
@@ -312,7 +362,25 @@ MyNumber MyNumber::operator-(MyNumber num){
 }
 
 MyNumber MyNumber::operator*(ll num){
-    return *this*MyNumber(num);
+    MyNumber ans=*this, in=*this;
+    if(num<0){
+        ans.SetSign(!ans.GetSign());
+        num=-num;
+    }
+    ull tmp=0;
+    for(ui i=ans.GetSize();i>=0;i--){
+        tmp=1ull*ans[i]*num;
+        in[i]=tmp/Lim;
+        ans[i]=tmp%Lim;
+    }
+    tmp=0;
+    for(ui i=ans.GetSize()-1;i>=0;i--){
+        tmp+=0ull*ans[i]+in[i+1];
+        ans[i]=tmp%Lim;
+        tmp/=Lim;
+    }
+    if(tmp!=0)ans.Number.PushBack(tmp);
+    return ans;
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
