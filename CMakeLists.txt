@@ -12,11 +12,9 @@ set(EXPORT_COMPILE_COMMANDS ON)
 file(GLOB SOURCES "src/*.cpp")
 add_executable(MyNumber ${SOURCES})
 
-# set curl path
 set(CMAKE_AR gcc-ar)
 set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static-libstdc++ -static-libgcc")
 
 target_compile_options(MyNumber PRIVATE -fdiagnostics-color=always -pedantic)
 
-# add curl
 target_include_directories(MyNumber PRIVATE ${CMAKE_SOURCE_DIR}/header)
