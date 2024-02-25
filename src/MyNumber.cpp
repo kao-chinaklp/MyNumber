@@ -124,13 +124,38 @@ void MyNumber::SetSize(ui new_size){
     this->Number.Resize(new_size, 0);
 }
 
-Vector<ui> MyNumber::GetNumber(){
+Vector<ui>& MyNumber::GetNumber(){
     return this->Number;
 }
 
 void MyNumber::RemoveLeadingZero(){
     while(this->GetSize()>1&&this->Number.Back()==0)
         this->Number.PopBack();
+}
+
+void MyNumber::Inverse(MyNumber& num, const ui len){
+    ui l=1;
+    while(l<len)l<<=1;
+    MyNumber tmp1, tmp2, tmp3;
+    tmp1.SetSize(l), tmp1.SetSize(l), tmp2.SetSize(l);
+    tmp1[0]=FastPow(num[0], mod-2);
+    tmp2=tmp1;
+    for(ui i=2;i<=l;i<<=1){
+        tmp2.NTTInit(i<<1, l);
+        tmp3=num;
+        NTT(tmp3.GetNumber(), i, 1);
+        NTT(tmp2.GetNumber(), i, 1);
+        for(ui j=0;j<i;j++)tmp2[j]=1ull*tmp2[j]*tmp3[j]%mod;
+        NTT(tmp2.GetNumber(), i, 0);
+        for(ui j=0;j<i<<1;j++)tmp2[j]=0;
+        tmp3=tmp1;
+        NTT(tmp3.GetNumber(), i, 1);
+        NTT(tmp2.GetNumber(), i, 1);
+        for(ui j=0;j<i;j++)tmp2[j]=1ull*tmp2[j]*tmp3[j]%mod;
+        NTT(tmp2.GetNumber(), i, 0);
+        for(ui j=i>>1;i<j;j++)tmp1[j]=(tmp1[j]*2-tmp2[j]+mod)%mod;
+    }
+    num=tmp1;
 }
 
 String MyNumber::Str(){
@@ -420,7 +445,7 @@ MyNumber MyNumber::operator*(MyNumber num){
     }
     while(len>1&&num1[len-1]==0)--len;
     str.Clear();
-    for(ui i=len-1;i!=-1;i--)
+    for(ui i=len-1;i!=(ui)-1;i--)
         str.PushBack(char(num1[i]+'0'));
     return MyNumber((flag?"":"-")+str);
 }
@@ -430,9 +455,31 @@ MyNumber MyNumber::operator/(ll num){
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
-    // To Do
-    // 算了懒得写了，留到明年吧（刨大坑）2023.12.31 23:55
-    return MyNumber(0);
+    if(*this==0||num==0)return MyNumber(0);
+    bool flag=this->GetSign()==num.GetSign();
+    this->SetSign(false), num.SetSign(false);
+    MyNumber tmp=*this, num1, num2;
+    String str=this->Str();
+    ui len1=str.Size();
+    for(Vector<char>::iterator p=str.begin();p!=str.end();p++)
+        num1.GetNumber().PushBack(*p-48);
+    str=num.Str();
+    ui len2=str.Size();
+    for(Vector<char>::reverseIterator p=str.begin();p!=str.end();p++)
+        num2.GetNumber().PushBack(*p-48);
+    ui l=num1.GetSize()-num2.GetSize()+1;
+    Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
+    Reverse(num2.GetNumber().begin(), num2.GetNumber().end());
+    Inverse(num1, num1.GetSize());
+    num1*=num2;
+    Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
+    str.Clear();
+    for(ui i=num1.GetSize()-1;i>=0;i--)
+        if(num1[i]>9){
+            num1[i-1]--;
+            str.PushBack(char(num1[i]%10+'0'));
+        }
+    return MyNumber((flag?"":"-")+str);
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
@@ -490,34 +537,13 @@ void MyNumber::NTT(Vector<ui>& arr, ui n, int inv){
         ll gn=FastPow(inv?g:gi, (mod-1)/(i<<1));
         for(ui j=0;j<n;j+=(i<<1)){
             ll g0=1;
-            for(int k=0;k<i;++k, g0=g0*gn%mod){
+            for(ui k=0;k<i;++k, g0=g0*gn%mod){
                 ll x=arr[j+k], y=g0*arr[i+j+k]%mod;
                 arr[j+k]=(x+y)%mod;
                 arr[i+j+k]=(x-y+mod)%mod;
             }
         }
     }
-}
-
-void MyNumber::Inverse(MyNumber& num1, MyNumber& num2, ui size){
-    if(size==0)size=this->GetSize();
-    if(size==1){
-        num2[0]=FastPow(num1[0], mod-2);
-        return;
-    }
-    MyNumber tmp;
-    Inverse(num1, num2, (size+1)/2);
-    ui len=1, l=0;
-    while(len<size*2)len<<=1, l++;
-    for(ui i=0;i<=len;i++)
-        tmp[i]=(i>=size?0:num1[i]);
-    NTTInit(len, l);
-    NTT(tmp.Number, len, 1);
-    NTT(num2.Number, len, 1);
-    for(ui i=0;i<=len;i++)
-        num2[i]=(1ull*num2[i]*2%mod-1ull*num2[i]*num2[i]%mod*tmp[i]%mod+mod)%mod;
-    NTT(num2.Number, len, 0);
-    for(ui i=size;i<=len;i++)num2[i]=0;
 }
 
 ui MyNumber::CountBits(){

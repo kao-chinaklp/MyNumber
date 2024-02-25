@@ -6,6 +6,8 @@ typedef unsigned long long ull;
 #include "String.h"
 #include "Vector.h"
 
+#include <map>
+
 const ui Lim=ui(1e9);
 
 class MyNumber{
@@ -74,8 +76,9 @@ class MyNumber{
         void SetSign(bool Sign);
         ui GetSize()const;
         void SetSize(ui new_size);
-        Vector<ui> GetNumber();
+        Vector<ui>& GetNumber();
         void RemoveLeadingZero();
+        void Inverse(MyNumber& num, const ui len);
 
     private:
         const ui mod=998244353;
@@ -86,7 +89,6 @@ class MyNumber{
         ll FastPow(ll num, ll idx);
         void NTTInit(ui len, ui size);
         void NTT(Vector<ui>& arr, ui n, int inv);
-        void Inverse(MyNumber& num1, MyNumber& num2, ui size=0);
         ui CountBits();
 };
 
