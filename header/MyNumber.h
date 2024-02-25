@@ -6,8 +6,6 @@ typedef unsigned long long ull;
 #include "String.h"
 #include "Vector.h"
 
-#include <map>
-
 const ui Lim=ui(1e9);
 
 class MyNumber{

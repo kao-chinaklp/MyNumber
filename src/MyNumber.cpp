@@ -465,7 +465,7 @@ MyNumber MyNumber::operator/(MyNumber num){
         num1.GetNumber().PushBack(*p-48);
     str=num.Str();
     ui len2=str.Size();
-    for(Vector<char>::reverseIterator p=str.begin();p!=str.end();p++)
+    for(Vector<char>::iterator p=str.begin();p!=str.end();p++)
         num2.GetNumber().PushBack(*p-48);
     ui l=num1.GetSize()-num2.GetSize()+1;
     Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
@@ -474,9 +474,9 @@ MyNumber MyNumber::operator/(MyNumber num){
     num1*=num2;
     Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
     str.Clear();
-    for(ui i=num1.GetSize()-1;i>=0;i--)
+    for(ui i=num1.GetSize()-1;i<Lim;i--)
         if(num1[i]>9){
-            num1[i-1]--;
+            if(i>0)num1[i-1]--;
             str.PushBack(char(num1[i]%10+'0'));
         }
     return MyNumber((flag?"":"-")+str);
