@@ -7,6 +7,8 @@ typedef unsigned long long ull;
 #include "Vector.h"
 
 const ui Lim=ui(1e9);
+const ui mod=998244353;
+const ui g=3, gi=332748118;
 
 class MyNumber{
     public:
@@ -54,7 +56,7 @@ class MyNumber{
         MyNumber operator*(ll num);
         MyNumber operator*(MyNumber num);
         MyNumber operator/(ll num);
-        MyNumber operator/(MyNumber num);
+        MyNumber operator/(MyNumber num); // To do
 
         MyNumber operator+=(ll num);
         MyNumber operator+=(MyNumber num);
@@ -70,6 +72,10 @@ class MyNumber{
         friend MyNumber operator/=(ll& num1, MyNumber num2);
 
     protected:
+        MyNumber operator<<(ll num);
+        MyNumber operator>>(ll num);
+        MyNumber operator<<=(ll num);
+        MyNumber operator>>=(ll num);
         bool GetSign()const;
         void SetSign(bool Sign);
         ui GetSize()const;
@@ -79,9 +85,8 @@ class MyNumber{
         void Inverse(MyNumber& num, const ui len);
 
     private:
-        const ui mod=998244353;
-        const ui g=3, gi=332748118;
         bool Sign; // true == negative  false == positive
+        ui Offset;
         Vector<ui> Number;
         Vector<ui> rev;
         ll FastPow(ll num, ll idx);

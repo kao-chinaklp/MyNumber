@@ -16,6 +16,7 @@ ll inline ceil(long double num){
 
 MyNumber::MyNumber(ll num){
     this->jump=false;
+    this->Offset=0;
     this->Number.Clear();
     if(num==0){
         this->Number.PushBack(0);
@@ -45,12 +46,14 @@ MyNumber::MyNumber(String num){
 
 MyNumber::MyNumber(MyNumber& num){
     this->jump=false;
+    this->Offset=num.Offset;
     this->Sign=num.GetSign();
     this->Number=Vector<ui>(num.GetNumber());
 }
 
 MyNumber::MyNumber(MyNumber&& num)noexcept{
     this->jump=num.jump=false;
+    this->Offset=num.Offset;num.Offset=0;
     this->Sign=num.GetSign();num.SetSign(false);
     this->Number=Vector<ui>(num.GetNumber());num.Number.Clear();
 }
@@ -62,6 +65,7 @@ MyNumber::~MyNumber(){
 
 MyNumber& MyNumber::operator=(ll num){
     this->jump=false;
+    this->Offset=0;
     this->Number.Clear();
     if(num==0){
         this->Number.PushBack(0);
@@ -97,12 +101,14 @@ MyNumber& MyNumber::operator=(String num){
 
 MyNumber& MyNumber::operator=(MyNumber& num){
     this->Sign=num.GetSign();
+    this->Offset=num.Offset;
     this->Number=Vector<ui>(num.GetNumber());
     return *this;
 }
 
 MyNumber& MyNumber::operator=(MyNumber&& num)noexcept{
     this->jump=num.jump=false;
+    this->Offset=num.Offset;num.Offset=0;
     this->Sign=num.GetSign();num.SetSign(false);
     this->Number=Vector<ui>(num.GetNumber());num.Number.Clear();
     return *this;
@@ -411,9 +417,10 @@ MyNumber MyNumber::operator*(ll num){
 MyNumber MyNumber::operator*(MyNumber num){
     if(*this==0||num==0)return MyNumber(0);
     bool flag=this->GetSign()==num.GetSign();
-    this->SetSign(false), num.SetSign(false);
+    num.SetSign(false);
     Vector<ui> num1, num2;
     String str=this->Str();
+    if(str[0]=='-')str.Erase(str.begin());
     ui len1=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();p++)
         num1.PushBack(*p-48);
@@ -451,35 +458,16 @@ MyNumber MyNumber::operator*(MyNumber num){
 }
 
 MyNumber MyNumber::operator/(ll num){
-    return *this/MyNumber(num);
-}
-
-MyNumber MyNumber::operator/(MyNumber num){
-    if(*this==0||num==0)return MyNumber(0);
-    bool flag=this->GetSign()==num.GetSign();
-    this->SetSign(false), num.SetSign(false);
-    MyNumber tmp=*this, num1, num2;
-    String str=this->Str();
-    ui len1=str.Size();
-    for(Vector<char>::iterator p=str.begin();p!=str.end();p++)
-        num1.GetNumber().PushBack(*p-48);
-    str=num.Str();
-    ui len2=str.Size();
-    for(Vector<char>::iterator p=str.begin();p!=str.end();p++)
-        num2.GetNumber().PushBack(*p-48);
-    ui l=num1.GetSize()-num2.GetSize()+1;
-    Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
-    Reverse(num2.GetNumber().begin(), num2.GetNumber().end());
-    Inverse(num1, num1.GetSize());
-    num1*=num2;
-    Reverse(num1.GetNumber().begin(), num1.GetNumber().end());
-    str.Clear();
-    for(ui i=num1.GetSize()-1;i<Lim;i--)
-        if(num1[i]>9){
-            if(i>0)num1[i-1]--;
-            str.PushBack(char(num1[i]%10+'0'));
-        }
-    return MyNumber((flag?"":"-")+str);
+    MyNumber ans=0;
+    ll tmp=0, p=this->GetSize();
+    ans.GetNumber().Resize(p);
+    while(--p>=0){
+        tmp=tmp*Lim+(*this)[p];
+        ans[p]=tmp/num;
+        tmp%=num;
+    }
+    ans.RemoveLeadingZero();
+    return ans;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
@@ -512,6 +500,33 @@ MyNumber MyNumber::operator/=(MyNumber num){
 
 MyNumber MyNumber::operator/=(ll num){
     return *this=*this/MyNumber(num);
+}
+
+MyNumber MyNumber::operator<<(ll num){
+    if(num<0)return (*this)>>-num;
+    MyNumber tmp(*this);
+    this->Number.Resize(this->GetSize()+num);
+    for(ui i=this->GetSize()-1;i>=num;i--)
+        this->Number[i]=this->Number[i-num];
+    return tmp;
+}
+
+MyNumber MyNumber::operator>>(ll num){
+    if(num<0)return (*this)<<-num;
+    MyNumber tmp(*this);
+    if(num>=this->GetSize())return MyNumber(0);
+    for(ui i=0;i<this->GetSize()-num;i++)
+        this->Number[i]=this->Number[i+num];
+    this->RemoveLeadingZero();
+    return tmp;
+}
+
+MyNumber MyNumber::operator<<=(ll num){
+    return *this=(*this)<<num;
+}
+
+MyNumber MyNumber::operator>>=(ll num){
+    return *this=(*this)>>num;
 }
 
 ll MyNumber::FastPow(ll num, ll idx){
