@@ -13,33 +13,35 @@ class String{
         String():String(""){};
         String(const char* init);
         String(const String& init);
+        String(String&& init) noexcept ;
         String(iterator _start, iterator _end);
         ~String();
 
-        void Assign(const ui size, const char& c);
-        ui Find(const char c, const ui pos=0);
-        ui Find(const String str, const ui pos=0);
-        ui Size()const;
+        void Assign(ui size, const char& c);
+        ui Find(char c, ui pos=0);
+        ui Find(const String& str, ui pos=0);
+        [[nodiscard]] ui Size()const;
+        [[nodiscard]] bool Empty()const;
         char& Front();
         char& Back();
 
-        void PushBack(const char c);
+        void PushBack(char c);
         void PopBack();
-        void Append(const char c);
-        void Append(const String str);
+        void Append(char c);
+        void Append(const String& str);
         void Clear();
         void Resize(ui size);
-        iterator Insert(const ui pos, const char& c);
+        iterator Insert(ui pos, const char& c);
         iterator Insert(iterator p, const char& c);
         iterator Erase(iterator p);
-        iterator Erase(const ui pos, const ui size);
-        String Substr(const ui pos, const ui size);
-        const iterator& cbegin()const;
-        const iterator& cend()const;
-        const iterator& begin()const;
-        const iterator& end()const;
-        const Vector<char>::reverseIterator& crbegin()const;
-        const Vector<char>::reverseIterator& crend()const;
+        iterator Erase(ui pos, ui size=1);
+        String Substr(ui pos, ui size=1);
+        [[nodiscard]] const iterator& cbegin()const;
+        [[nodiscard]] const iterator& cend()const;
+        [[nodiscard]] const iterator& begin()const;
+        [[nodiscard]] const iterator& end()const;
+        [[nodiscard]] const Vector<char>::reverseIterator& crbegin()const;
+        [[nodiscard]] const Vector<char>::reverseIterator& crend()const;
         iterator& begin();
         iterator& end();
         Vector<char>::reverseIterator& rbegin();
@@ -50,11 +52,11 @@ class String{
         char& operator[](ui pos);
         const char& operator[](ui pos)const;
         String operator+(const String& str);
-        String operator+(const char c);
+        String operator+(char c);
         String operator+(const char* p);
         String& operator+=(const String& str);
         String& operator+=(const char& c);
-        String& operator+=(char* p);
+        String& operator+=(const char* p);
         bool operator==(const String& str);
         bool operator!=(const String& str);
         bool operator<(const String& str);
@@ -66,7 +68,7 @@ class String{
 
 std::istream& operator>>(std::istream& o, String& str);
 std::ostream& operator<<(std::ostream& o, const String& str);
-String operator+(const char c, const String& str);
+String operator+(char c, const String& str);
 String operator+(const char* p, const String& str);
 
 String ToString(long long num);

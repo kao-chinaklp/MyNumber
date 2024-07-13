@@ -1,12 +1,12 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
-#include <assert.h>
+#include <cassert>
 
 typedef unsigned int ui;
 
 template<class T>
-void inline swap(T& a, T& b){
+void inline swap(T& a, T& b)noexcept{
     T c=a;
     a=b;
     b=c;
@@ -21,10 +21,10 @@ class Vector{
             reverseIterator()=default;
             reverseIterator(const Vector<T>::iterator& it):rIt(it){}
             reverseIterator(const reverseIterator& it):rIt(it.rIt){}
-            reverseIterator(reverseIterator&& it):rIt(it.rIt){it.rIt=nullptr;}
+            reverseIterator(reverseIterator&& it)noexcept:rIt(it.rIt){it.rIt=nullptr;}
             reverseIterator& operator=(const Vector<T>::iterator& it){rIt=it;return *this;}
             reverseIterator& operator=(const reverseIterator& it){rIt=it.rIt;return *this;}
-            reverseIterator& operator=(reverseIterator&& it){rIt=it.rIt,it.rIt=nullptr;return *this;}
+            reverseIterator& operator=(reverseIterator&& it)noexcept{rIt=it.rIt,it.rIt=nullptr;return *this;}
             reverseIterator& operator++(){--rIt;return *this;}
             reverseIterator operator++(int){auto tmp=*this;--rIt;return tmp;}
             reverseIterator& operator--(){++rIt;return *this;}
@@ -41,9 +41,9 @@ class Vector{
         };
 
         Vector():Vector(1){IsInit=true;};
-        Vector(ui size, const T val=0);
-        Vector(int size, const T val=0);
-        Vector(const iterator _start, const iterator _end);
+        explicit Vector(ui size, T val=0);
+        explicit Vector(int size, T val=0);
+        Vector(iterator _start, iterator _end);
         Vector(const Vector<T>& x);
         Vector(Vector<T>&& x)noexcept;
         ~Vector();
@@ -53,9 +53,9 @@ class Vector{
         T& operator[](ui pos);
         const T& operator[](ui pos)const;
 
-        ui Size()const;
-        bool Empty();
-        bool Empty()const;
+        [[nodiscard]] ui Size()const;
+        [[nodiscard]] bool Empty();
+        [[nodiscard]] bool Empty()const;
         void Clear();
         const iterator& EOS()const;
         const iterator& cbegin()const;
@@ -71,21 +71,21 @@ class Vector{
         T& Front();
         T& Back();
 
-        void Assign(const ui size, const T& val);
+        void Assign(ui size, const T& val);
         void Assign(iterator _start, iterator _end);
         void PushBack(const T& val);
         void PopBack();
-        iterator Insert(const ui pos, const T& val);
+        iterator Insert(ui pos, const T& val);
         iterator Insert(iterator p, const T& val);
         iterator Erase(iterator p);
-        iterator Erase(const ui pos, const ui size=1);
+        iterator Erase(ui pos, ui size=1);
 
         void ShrinkToFit();
         void Reserse(ui size);
         void Resize(ui size, const T& val=T());
 
     protected:
-        ui Capacity()const;
+        [[nodiscard]] ui Capacity()const;
 
     private:
         bool IsInit;
@@ -157,8 +157,8 @@ Vector<T>::Vector(Vector<T>&& x)noexcept{
     this->Start=x.Start;x.Start=nullptr;
     this->Finish=x.Finish;x.Finish=nullptr;
     this->EndOfStorage=x.EndOfStorage;x.EndOfStorage=nullptr;
-    this->Rbegin=x.Rbegin;x.Rbegin=nullptr;
-    this->Rend=x.Rend;x.Rend=nullptr;
+    this->Rstart=x.Rstart;x.Rstart=nullptr;
+    this->Rfinish=x.Rfinish;x.Rfinish=nullptr;
 }
 
 template <class T>
@@ -186,8 +186,7 @@ Vector<T>& Vector<T>::operator=(Vector<T>&& x)noexcept{
 }
 
 template <class T>
-T &Vector<T>::operator[](ui pos)
-{
+T &Vector<T>::operator[](ui pos){
     assert(pos<Size());
     return Start[pos];
 }
@@ -366,6 +365,7 @@ typename Vector<T>::iterator Vector<T>::Erase(const ui pos, const ui size){
     assert(pos+size<=this->Size());
     for(ui p=pos+size, len=this->Size();p<len;p++)
         Start[p-size]=Start[p];
+    this->Finish-=size;
     this->ShrinkToFit();
     return Start+pos;
 }

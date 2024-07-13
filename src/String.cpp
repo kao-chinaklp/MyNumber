@@ -20,6 +20,11 @@ String::String(const String& init){
         Data[i]=init[i];
 }
 
+String::String(String&& init)noexcept{
+    Data=init.Data;
+    init.Clear();
+}
+
 String::String(String::iterator _start, String::iterator _end){
     ui size=_end-_start;
     Data.Resize(size);
@@ -43,7 +48,7 @@ ui String::Find(const char c, const ui pos)
     return -1;
 }
 
-ui String::Find(const String str, const ui pos){
+ui String::Find(const String& str, const ui pos){
     if(str.Size()>this->Size())return -1;
     // KMP
     ui* nxt=new ui[this->Size()];
@@ -67,6 +72,10 @@ ui String::Size()const{
     return Data.Size();
 }
 
+bool String::Empty()const{
+    return this->cbegin()==this->cend();
+}
+
 inline char& String::Front(){
     return Data.Front();
 }
@@ -87,7 +96,7 @@ void String::Append(const char c){
     Data.PushBack(c);
 }
 
-void String::Append(const String str){
+void String::Append(const String& str){
     Data.Reserse(this->Size()+str.Size());
     for(char& c:str)Data.PushBack(c);
 }
@@ -119,7 +128,7 @@ String::iterator String::Erase(String::iterator p){
 String String::Substr(const ui pos, const ui size){
     assert(pos+size<=this->Size());
     String res="";
-    for(int p=pos;p<pos+size;p++)
+    for(ui p=pos;p<pos+size;p++)
         res.PushBack((*this)[p]);
     return res;
 }
@@ -213,7 +222,7 @@ String& String::operator+=(const char& c){
     return *this;
 }
 
-String& String::operator+=(char* p){
+String& String::operator+=(const char* p){
     this->Append(p);
     return *this;
 }
@@ -237,8 +246,8 @@ bool String::operator<(const String& str){
         return true;
     }
     else {
-        ui len=0;
-        bool flag=false;
+        ui len;
+        bool flag;
         if(this->Size()>str.Size())
             len=str.Size(), flag=false;
         else 
@@ -256,8 +265,8 @@ bool String::operator>(const String& str){
         return true;
     }
     else {
-        ui len=0;
-        bool flag=false;
+        ui len;
+        bool flag;
         if(this->Size()>str.Size())
             len=str.Size(), flag=true;// Different from less
         else 
@@ -295,12 +304,12 @@ String operator+(const char* p, const String& str){
 }
 
 String ToString(long long num){
-    if(num==0)return String("0");
+    if(num==0)return {"0"};
     String ans;
     bool sign=true;
     if(num<0)sign=false;
     while(num){
-        ans.PushBack(char(num%10+'0'));
+        ans.PushBack(static_cast<char>(num%10+'0'));
         num/=10;
     }
     Reverse(ans.begin(), ans.end());
@@ -316,7 +325,6 @@ long long ToDigit(String str){
         p++;
     }
     while(p<str.Size()){
-        auto tmp=str[p];
         assert(std::isdigit(str[p]));
         num=num*10+str[p++]-'0';
     }
