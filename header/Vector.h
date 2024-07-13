@@ -135,8 +135,8 @@ Vector<T>::Vector(const iterator _start, const iterator _end){
         PushBack(*_start);
         ++_start;
     }
-    Rstart=end()-1;
-    Rfinish=begin()-1;
+    Rstart=Finish-1;
+    Rfinish=Start-1;
 }
 
 template<class T>
@@ -330,6 +330,7 @@ template<class T>
 typename Vector<T>::iterator Vector<T>::Insert(typename Vector<T>::iterator p, const T& val){
     assert(p>=Start);
     assert(p<=Finish);
+
     if(Finish==EndOfStorage){
         ui len=Size();
         ui pos=p-Start;
@@ -344,6 +345,8 @@ typename Vector<T>::iterator Vector<T>::Insert(typename Vector<T>::iterator p, c
     }
     *p=val;
     ++Finish;
+    Rstart=Finish-1;
+
     return p+1;
 }
 
@@ -351,22 +354,28 @@ template<class T>
 typename Vector<T>::iterator Vector<T>::Erase(typename Vector<T>::iterator p){
     assert(p>=Start);
     assert(p<Finish);
+
     iterator pos=p;
     while(pos<Finish){
         *pos=*(pos+1);
         ++pos;
     }
     --Finish;
+    Rstart=Finish-1;
+
     return p;
 }
 
 template<class T>
 typename Vector<T>::iterator Vector<T>::Erase(const ui pos, const ui size){
     assert(pos+size<=this->Size());
+
     for(ui p=pos+size, len=this->Size();p<len;p++)
         Start[p-size]=Start[p];
     this->Finish-=size;
+    this->Rstart=this->Finish-1;
     this->ShrinkToFit();
+
     return Start+pos;
 }
 
@@ -388,6 +397,8 @@ void Vector<T>::Reserse(ui size){
         }
         Start=tmp;
         Finish=Start+oldSize;
+        Rstart=Finish-1;
+        Rfinish=Start-1;
         EndOfStorage=Start+size;
     }
 }
@@ -417,6 +428,8 @@ void Vector<T>::Resize(ui size, const T& val){
             }
         }
     }
+    Rstart=Finish-1;
+    Rfinish=Start-1;
 }
 
 template<class T>

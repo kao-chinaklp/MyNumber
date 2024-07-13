@@ -37,40 +37,39 @@ MyNumber::MyNumber(String num){
     this->Number.Clear();
 
     Vector<ui>& t_num=this->Number;
-    String integer, decimal;
-    ui point=num.Find("."), tmp=0, cnt=0;
+    String integer, decimal, tmpp;
+    ui point=num.Find("."), cnt=0;
     if(point==static_cast<ui>(-1))point=num.Size();
-    num.Erase(point);
+    else num.Erase(point);
 
-    integer=num.Substr(0, point+1);
+    integer=num.Substr(0, point);
     decimal=num.Substr(point, num.Size()-point);
-
-    this->Offset=num.Size()-point;
 
     if(!decimal.Empty()){
         for(char c:decimal){
-            tmp=tmp*10+c-'0';
+            tmpp+=c;
             if(++cnt==9){
-                t_num.PushBack(tmp);
-                cnt=tmp=0;
+                t_num.PushBack(ToDigit(tmpp));
+                cnt=0, tmpp.Clear();
             }
         }
-        if(tmp!=0){
-            while(cnt++<9)tmp*=10;
-            t_num.PushBack(tmp);
+        if(!tmpp.Empty()){
+            while(++cnt<9)tmpp+="0";
+            t_num.PushBack(ToDigit(tmpp));
         }
         Reverse(t_num.begin(), t_num.end());
+        this->Offset=t_num.Size();
     }
 
-    tmp=cnt=0;
+    cnt=0, tmpp.Clear();
     for(ui p=integer.Size()-1;p!=static_cast<ui>(-1);p--){
-        tmp*=10+integer[p]-'0';
+        tmpp+=integer[p];
         if(++cnt==9){
-            t_num.PushBack(tmp);
-            tmp=cnt=0;
+            t_num.PushBack(ToDigit(tmpp));
+            cnt=0, tmpp.Clear();
         }
-        if(tmp!=0)t_num.PushBack(tmp);
     }
+    if(cnt>0)t_num.PushBack(ToDigit(tmpp));
 }
 
 MyNumber::MyNumber(MyNumber& num){
@@ -107,6 +106,7 @@ MyNumber& MyNumber::operator=(ll num){
         this->Number.PushBack(num%Lim);
         num/=Lim;
     }
+
     return *this;
 }
 
@@ -245,16 +245,17 @@ String MyNumber::Str(){
 
     for(ui p=point, len=this->GetSize();p<len;p++){
         String tmp=ToString(num[p]);
-        while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
+        while(tmp.Size()<8)tmp.Insert(tmp.begin(), '0');
         out+=tmp;
     }
 
     ui cnt=0;
-    auto ptr=out.end()-1;
-    while(*(ptr)=='0'&&ptr!=out.begin())cnt++, ptr--;
+    auto ptr=out.end()-1, tmp=ptr-this->Offset*9;
+    while(*(ptr)=='0'&&ptr!=tmp)cnt++, ptr--;
     out.Resize(out.Size()-cnt);
     if(this->Sign&&out!="0")out.Insert(out.begin(), '-');
     if(*(out.end()-1)=='.')out.PopBack();
+
     return out;
 }
 
@@ -572,17 +573,20 @@ MyNumber MyNumber::operator*(ll num){
 MyNumber MyNumber::operator*(MyNumber num){
     if(*this==0||num==0)return {0};
 
+    MyNumber tmp(*this);
     Vector<ui> num1, num2;
+    ui tmpp, offset=0;
     bool flag=this->Sign==num.Sign;
-    num.Sign=false;
+    tmp.Sign=num.Sign=false;
 
     String str=this->Str();
-    if(str[0]=='-')str.Erase(str.begin());
+    if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
     ui len1=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num1.PushBack(*p-48);
 
     str=num.Str();
+    if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
     ui len2=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num2.PushBack(*p-48);
@@ -600,23 +604,30 @@ MyNumber MyNumber::operator*(MyNumber num){
     NTT(num1, len, 0);
     ll inv=FastPow(len, mod-2);// Inverse
 
+    for(ui i=0;i<len;i++)num2[i]=0;
     for(ui i=0;i<len;i++){
-        num1[i]=1ll*num1[i]*inv%mod;
+        num2[i]+=1ll*num1[i]*inv%mod;
         if(i<len-1){
-            num1[i+1]+=num1[i]/10;
-            num1[i]%=10;
+            num2[i+1]+=num2[i]/10;
+            num2[i]%=10;
         }
     }
 
-    while(num1[len-1]>9){
-        num1.PushBack(num1[len-1]/10);
-        num1[len-1]%=10;
+    while(num2[len-1]>9){
+        num2.PushBack(num2[len-1]/10);
+        num2[len-1]%=10;
         len++;
     }
-    while(len>1&&num1[len-1]==0)--len;
+    while(len>1&&num2[len-1]==0)--len;
     str.Clear();
     for(ui i=len-1;i<Lim;i--)
-        str.PushBack(static_cast<char>(num1[i]+'0'));
+        str.PushBack(static_cast<char>(num2[i]+'0'));
+    if(tmp.Offset+num.Offset>0)str.Insert(str.Size()-offset, '.');
+    auto ptr=str.end()-1;
+    while(ptr!=str.begin()+1&&*ptr=='0'){
+        str.PopBack(), ptr--;
+        if(*ptr=='.')break;
+    }
 
     return MyNumber((flag?"":"-")+str);
 }
