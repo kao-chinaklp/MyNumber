@@ -6,12 +6,9 @@ using namespace std;
 
 int main(){
     MyNumber num1, num2;
-    String in;
     while(true){
-        cin>>in;
-        num1=in;
-        cin>>in;
-        num2=in;
+        cin>>num1;
+        cin>>num2;
         auto res=num1+num2;
         cout<<res.Str()<<"\n";
     }

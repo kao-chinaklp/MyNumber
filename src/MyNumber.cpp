@@ -191,7 +191,7 @@ const Vector<ui> &MyNumber::GetNumber()const{
 }
 
 void MyNumber::RemoveLeadingZero(){
-    while(this->GetSize()>1&&this->Number.Back()==0)
+    for(ui i=this->GetSize();i>this->Offset+1&&this->Number.Back()==0;i--)
         this->Number.PopBack();
 }
 
@@ -477,8 +477,6 @@ MyNumber MyNumber::operator+(ll num){
     return *this+MyNumber(num);
 }
 
-#include <iostream>
-
 MyNumber MyNumber::operator+(MyNumber num){
     MyNumber tmp(*this), ans=0;
 
@@ -529,7 +527,7 @@ MyNumber MyNumber::operator-(MyNumber num){
     num<<=(new_offset-num.Offset);
 
     for(ui i=0;i<new_size;i++){
-        ans[i]=tmp[i]-num[i];
+        ans[i]+=tmp[i]-num[i];
         if(ans[i]>=Lim){
             ans[i]+=Lim;
             ans[i+1]--;
@@ -781,4 +779,16 @@ inline MyNumber operator/=(ll& num1, MyNumber num2){
     ll tmp=num2.GetNumber()[0]+num2.GetNumber()[1]*Lim;
     if(num2.Sign)tmp=-tmp;
     return num1+=tmp;
+}
+
+std::istream& operator>>(std::istream& i, MyNumber& num){
+    String str;
+    i>>str;
+    num=str;
+    return i;
+}
+
+std::ostream& operator<<(std::ostream& o, const MyNumber& num){
+    o<<num.Str();
+    return o;
 }

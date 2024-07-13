@@ -107,4 +107,7 @@ MyNumber operator-=(ll& num1, MyNumber num2);
 MyNumber operator*=(ll& num1, MyNumber num2);
 MyNumber operator/=(ll& num1, MyNumber num2);
 
+std::istream& operator>>(std::istream& i, MyNumber& num);
+std::ostream& operator<<(std::ostream& o, const MyNumber& num);
+
 #endif

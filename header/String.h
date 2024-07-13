@@ -66,7 +66,7 @@ class String{
         Vector<char>Data;
 };
 
-std::istream& operator>>(std::istream& o, String& str);
+std::istream& operator>>(std::istream& i, String& str);
 std::ostream& operator<<(std::ostream& o, const String& str);
 String operator+(char c, const String& str);
 String operator+(const char* p, const String& str);

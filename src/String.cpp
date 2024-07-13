@@ -277,15 +277,15 @@ bool String::operator>(const String& str){
     }
 }
 
-std::istream& operator>>(std::istream& o, String& str){
+std::istream& operator>>(std::istream& i, String& str){
     char tmp;
     str.Clear();
     while(true){
-        tmp=o.get();
+        tmp=i.get();
         if(tmp==' '||tmp=='\n'||tmp==EOF)break;
         str.PushBack(tmp);
     }
-    return o;
+    return i;
 }
 
 std::ostream& operator<<(std::ostream& o, const String& str){
