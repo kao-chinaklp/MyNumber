@@ -1,8 +1,6 @@
 #ifndef MYNUMBER_H_
 #define MYNUMBER_H_
 
-#define DEBUG printf("DEBUG\n")
-
 typedef long long ll;
 typedef unsigned long long ull;
 
@@ -17,11 +15,9 @@ class MyNumber{
     public:
         MyNumber():MyNumber(0){}
         MyNumber(ll num);
-        explicit MyNumber(String num);
         MyNumber(MyNumber& num);
         MyNumber(MyNumber&& num)noexcept;
         MyNumber& operator=(ll num);
-        MyNumber& operator=(String num);
         MyNumber& operator=(const MyNumber& num);
         MyNumber& operator=(MyNumber&& num)noexcept;
 
@@ -29,6 +25,7 @@ class MyNumber{
         ~MyNumber();
         String Str();
         [[nodiscard]] String Str()const;
+        friend MyNumber abs(MyNumber num);
 
     public:
         ui& operator[](ui idx);
@@ -59,7 +56,7 @@ class MyNumber{
         MyNumber operator*(ll num);
         MyNumber operator*(MyNumber num);
         MyNumber operator/(ll num);
-        MyNumber operator/(MyNumber num); // To do
+        MyNumber operator/(MyNumber num);
 
         MyNumber operator+=(ll num);
         MyNumber operator+=(MyNumber num);
@@ -74,7 +71,12 @@ class MyNumber{
         friend MyNumber operator*=(ll& num1, MyNumber num2);
         friend MyNumber operator/=(ll& num1, MyNumber num2);
 
+        friend std::istream& operator>>(std::istream& i, MyNumber& num);
+        friend std::ostream& operator<<(std::ostream& o, const MyNumber& num);
+
     protected:
+        explicit MyNumber(String num);
+        MyNumber& operator=(String num);
         MyNumber operator<<(ll num);
         MyNumber operator>>(ll num);
         MyNumber operator<<=(ll num);
@@ -86,6 +88,7 @@ class MyNumber{
         void RemoveLeadingZero();
         void RemoveBackZero();
         void Inverse(MyNumber& num, ui len);
+        MyNumber Int();
 
     private:
         bool jump{};
@@ -109,5 +112,7 @@ MyNumber operator/=(ll& num1, MyNumber num2);
 
 std::istream& operator>>(std::istream& i, MyNumber& num);
 std::ostream& operator<<(std::ostream& o, const MyNumber& num);
+
+MyNumber abs(MyNumber num);
 
 #endif

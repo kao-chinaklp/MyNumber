@@ -76,11 +76,11 @@ bool String::Empty()const{
     return this->cbegin()==this->cend();
 }
 
-inline char& String::Front(){
+char& String::Front(){
     return Data.Front();
 }
 
-inline char& String::Back(){
+char& String::Back(){
     return Data.Back();
 }
 
