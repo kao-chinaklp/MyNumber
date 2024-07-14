@@ -58,13 +58,12 @@ MyNumber::MyNumber(String num){
             t_num.PushBack(ToDigit(tmpp));
         }
         Reverse(t_num.begin(), t_num.end());
-        this->Offset=t_num.Size();
     }
+    this->Offset=t_num.Size();
 
-    // To do
     cnt=0, tmpp.Clear();
     for(ui p=integer.Size()-1;p!=static_cast<ui>(-1);p--){
-        tmpp+=integer[p];
+        tmpp=integer[p]+tmpp;
         if(++cnt==8){
             t_num.PushBack(ToDigit(tmpp));
             cnt=0, tmpp.Clear();
@@ -237,7 +236,7 @@ String MyNumber::Str(){
 
     for(int p=0;p<point;p++){
         String tmp=ToString(num[p]);
-        if(p!=0)while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
+        if(p!=0)while(tmp.Size()<8)tmp.Insert(tmp.begin(), '0');
         out+=tmp;
     }
 
