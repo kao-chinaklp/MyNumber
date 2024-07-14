@@ -163,6 +163,7 @@ MyNumber& MyNumber::operator=(const MyNumber& num){
     this->Sign=num.Sign;
     this->Offset=num.Offset;
     this->Number=Vector<ui>(num.GetNumber());
+
     return *this;
 }
 
@@ -171,6 +172,7 @@ MyNumber& MyNumber::operator=(MyNumber&& num)noexcept{
     this->Offset=num.Offset;num.Offset=0;
     this->Sign=num.Sign;num.Sign=false;
     this->Number=Vector<ui>(num.GetNumber());num.Number.Clear();
+
     return *this;
 }
 
@@ -203,12 +205,14 @@ void MyNumber::RemoveBackZero(){
 }
 
 void MyNumber::Inverse(MyNumber& num, const ui len){
-    ui l=1;
-    while(l<len)l<<=1;
     MyNumber tmp1, tmp2, tmp3;
+    ui l=1;
+
+    while(l<len)l<<=1;
     tmp1.SetSize(l), tmp1.SetSize(l), tmp2.SetSize(l);
     tmp1[0]=FastPow(num[0], mod-2);
     tmp2=tmp1;
+
     for(ui i=2;i<=l;i<<=1){
         tmp2.NTTInit(i<<1, l);
         tmp3=num;
@@ -276,6 +280,7 @@ MyNumber MyNumber::operator++(){
         this->jump=true;
         return --(*this);
     }
+
     auto iter=this->Number.begin()+this->Offset;
     auto End=this->Number.end();
     ++(*iter);
@@ -289,6 +294,7 @@ MyNumber MyNumber::operator++(){
         this->Number.PushBack(1);
     }
     this->jump=false;
+
     return *this;
 }
 
@@ -303,6 +309,7 @@ MyNumber MyNumber::operator--(){
         this->jump=true;
         return ++(*this);
     }
+
     auto iter=this->Number.begin();
     auto End=this->Number.end();
     --(*iter);
@@ -317,18 +324,21 @@ MyNumber MyNumber::operator--(){
         if(!this->Sign&&*(iter-1)>=Lim)this->Sign=true,*(iter-1)=1;
     }
     this->jump=false;
+
     return (*this);
 }
 
 MyNumber MyNumber::operator--(int){
     MyNumber tmp(*this);
     --(*this);
+
     return tmp;
 }
 
 MyNumber MyNumber::operator-(){
     MyNumber tmp(*this);
     tmp.Sign=!this->Sign;
+
     return tmp;
 }
 
@@ -337,6 +347,7 @@ bool MyNumber::operator==(ll num){
        this->Sign==false&&num<0)return false;
     if(this->GetSize()>1)return false;
     if(num<0)num=-num;
+
     return (*this)[0]==num;
 }
 
@@ -345,6 +356,7 @@ bool MyNumber::operator==(const MyNumber& num){
         return false;
     for(ui i=0, len=this->GetSize();i<len;i++)
         if((*this)[i]!=num[i])return false;
+
     return true;
 }
 
@@ -353,6 +365,7 @@ bool MyNumber::operator!=(ll num){
        this->Sign==true&&num<0)return false;
     if(this->GetSize()>1)return true;
     if(num<0)num=-num;
+
     return (*this)[0]!=num;
 }
 
@@ -361,16 +374,7 @@ bool MyNumber::operator!=(const MyNumber& num){
 }
 
 bool MyNumber::operator<(ll num){
-    if(this->Sign==true&&num>=0)return true;
-    if(this->Sign==false&&num<=0)return false;
-    if(num<0){
-        num=-num;
-        if(this->GetSize()>1)return true;
-        else return (*this)[0]>num;
-    }
-    else
-        if(this->GetSize()>1)return false;
-        else return (*this)[0]<num;
+    return (*this)<MyNumber(num);
 }
 
 bool MyNumber::operator<(const MyNumber& num){
@@ -410,16 +414,7 @@ bool MyNumber::operator<(const MyNumber& num){
 }
 
 bool MyNumber::operator>(ll num){
-    if(this->Sign==true&&num>=0)return false;
-    if(this->Sign==false&&num<0)return true;
-    if(num<0){
-        num=-num;
-        if(this->GetSize()>1)return false;
-        else return (*this)[0]<num;
-    }
-    else 
-        if(this->GetSize()>1)return true;
-        else return (*this)[0]>num;
+    return (*this)>MyNumber(num);
 }
 
 bool MyNumber::operator>(const MyNumber& num){
