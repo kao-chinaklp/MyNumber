@@ -61,10 +61,11 @@ MyNumber::MyNumber(String num){
         this->Offset=t_num.Size();
     }
 
+    // To do
     cnt=0, tmpp.Clear();
     for(ui p=integer.Size()-1;p!=static_cast<ui>(-1);p--){
         tmpp+=integer[p];
-        if(++cnt==9){
+        if(++cnt==8){
             t_num.PushBack(ToDigit(tmpp));
             cnt=0, tmpp.Clear();
         }
