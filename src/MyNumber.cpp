@@ -233,9 +233,14 @@ void MyNumber::Inverse(MyNumber& num, const ui len){
     num=tmp1;
 }
 
+MyNumber MyNumber::Abs(MyNumber num){
+    num.Sign=false;
+    return num;
+}
+
 MyNumber MyNumber::Int(){
     MyNumber tmp(*this);
-    Number.Erase(0, Offset);
+    tmp.GetNumber().Erase(0, Offset);
     tmp.Offset=0;
     return tmp;
 }
@@ -402,13 +407,21 @@ bool MyNumber::operator<(const MyNumber& num){
     // Determine the integer part
     bool offset1=num1.Find('.')!=static_cast<ui>(-1);
     bool offset2=num2.Find('.')!=static_cast<ui>(-1);
-    ui size1=num1.Size()-offset1, size2=num2.Size()-offset2;
+    ui _size=num1.Size()-offset1;
 
     if((offset1?num1.Find('.'):num1.Size())<(offset2?num2.Find('.'):num2.Size()))return !flag;
     if((offset1?num1.Find('.'):num1.Size())>(offset2?num2.Find('.'):num2.Size()))return flag;
-    for(ui i=0, len=size1-this->Offset;i<len;i++){
-        if(num1[i]<num2[i])return !flag;
-        if(num1[i]>num2[i])return flag;
+    if(offset1){
+        for(ui i=0, len=num1.Find('.');i<len;i++){
+            if(num1[i]<num2[i])return !flag;
+            if(num1[i]>num2[i])return flag;
+        }
+    }
+    else{
+        for(ui i=0, len=_size;i<len;i++){
+            if(num1[i]<num2[i])return !flag;
+            if(num1[i]>num2[i])return flag;
+        }
     }
 
     // Determine the decimal part
@@ -442,13 +455,21 @@ bool MyNumber::operator>(const MyNumber& num){
     // Determine the integer part
     bool offset1=num1.Find('.')!=static_cast<ui>(-1);
     bool offset2=num2.Find('.')!=static_cast<ui>(-1);
-    ui size1=num1.Size()-offset1, size2=num2.Size()-offset2;
+    ui _size=num1.Size()-offset1;
 
     if((offset1?num1.Find('.'):num1.Size())>(offset2?num2.Find('.'):num2.Size()))return !flag;
     if((offset1?num1.Find('.'):num1.Size())<(offset2?num2.Find('.'):num2.Size()))return flag;
-    for(ui i=0, len=size1-this->Offset;i<len;i++){
-        if(num1[i]>num2[i])return !flag;
-        if(num1[i]<num2[i])return flag;
+    if(offset1){
+        for(ui i=0, len=num1.Find('.');i<len;i++){
+            if(num1[i]>num2[i])return !flag;
+            if(num1[i]<num2[i])return flag;
+        }
+    }
+    else{
+        for(ui i=0, len=_size;i<len;i++){
+            if(num1[i]>num2[i])return !flag;
+            if(num1[i]<num2[i])return flag;
+        }
     }
 
     // Determine the decimal part
@@ -656,16 +677,11 @@ MyNumber MyNumber::operator/(MyNumber num){
     assert(num!=0);
 
     MyNumber x0("0.5"), x1=x0;
-    String str=x0.Str();
-    while(true) {
-        str=((2-x0*num)*x0).Str();
-        x0=x0*(2-x0*num);
-        if(x0.Int()==x1.Int())break;
-        x1=x0;
-    }
+    for(ui i=0;i<=10;i++)
+        x0*=(2-x0*num);
 
-    if(abs((*this)-(*this)*x0)<abs((*this)-(*this)*(x0+1)))return *this*x0;
-    return *this*(x0+1);
+    MyNumber res1=(*this)*x0, res2=(*this)*(x0+1);
+    return (Abs(res1-num)<Abs(res2-num)?res1.Int():res2.Int());
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){

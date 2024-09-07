@@ -81,22 +81,25 @@ class MyNumber{
         MyNumber operator>>(ll num);
         MyNumber operator<<=(ll num);
         MyNumber operator>>=(ll num);
+
         [[nodiscard]] ui GetSize()const;
         void SetSize(ui new_size);
         Vector<ui>& GetNumber();
         [[nodiscard]] const Vector<ui>& GetNumber()const;
+
         void RemoveLeadingZero();
         void RemoveBackZero();
         void Inverse(MyNumber& num, ui len);
+        static MyNumber Abs(MyNumber num);
+        ll FastPow(ll num, ll idx);
         MyNumber Int();
 
     private:
-        bool jump{};
+        bool jump;
         bool Sign; // true == negative  false == positive
         ui Offset; // 0 - Offset is decimal part, Offset - size is integer part
         Vector<ui> Number;
         Vector<ui> rev;
-        static ll FastPow(ll num, ll idx);
         void NTTInit(ui len, ui size);
         void NTT(Vector<ui>& arr, ui n, int inv);
 };
