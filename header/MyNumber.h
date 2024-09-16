@@ -87,6 +87,7 @@ class MyNumber{
         Vector<ui>& GetNumber();
         [[nodiscard]] const Vector<ui>& GetNumber()const;
 
+        void KeepDecimals(ui len);
         void RemoveLeadingZero();
         void RemoveBackZero();
         void Inverse(MyNumber& num, ui len);
@@ -95,7 +96,7 @@ class MyNumber{
         MyNumber Int();
 
     private:
-        bool jump;
+        bool jump{};
         bool Sign; // true == negative  false == positive
         ui Offset; // 0 - Offset is decimal part, Offset - size is integer part
         Vector<ui> Number;

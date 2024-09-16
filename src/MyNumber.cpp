@@ -47,7 +47,7 @@ MyNumber::MyNumber(String num){
     decimal=num.Substr(point, num.Size()-point);
 
     if(!decimal.Empty()){
-        for(char c:decimal){
+        for(const char c:decimal){
             tmp=tmp*10+c-'0';
             if(++cnt==9){
                 t_num.PushBack(tmp);
@@ -194,6 +194,13 @@ const Vector<ui> &MyNumber::GetNumber()const{
     return this->Number;
 }
 
+void MyNumber::KeepDecimals(ui len){
+    if(len>=this->Offset)return;
+    this->Number.Erase(0, this->Offset-len);
+    this->Offset=len;
+}
+
+
 void MyNumber::RemoveLeadingZero(){
     for(ui i=this->GetSize();i>this->Offset+1&&this->Number.Back()==0;i--)
         this->Number.PopBack();
@@ -246,11 +253,11 @@ MyNumber MyNumber::Int(){
 }
 
 String MyNumber::Str(){
+    this->RemoveLeadingZero();
     String out;
     ui point=this->GetSize()-this->Offset;
     Vector<ui> num=this->Number;
 
-    this->RemoveLeadingZero();
     Reverse(num.begin(), num.end());
 
     for(int p=0;p<point;p++){
@@ -264,7 +271,7 @@ String MyNumber::Str(){
 
     for(ui p=point, len=this->GetSize();p<len;p++){
         String tmp=ToString(num[p]);
-        while(tmp.Size()<8)tmp.Insert(tmp.begin(), '0');
+        while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
         out+=tmp;
     }
 
@@ -601,23 +608,32 @@ MyNumber MyNumber::operator*(MyNumber num){
 
     MyNumber tmp(*this);
     Vector<ui> num1, num2;
-    ui tmpp, offset=0;
+    ui tmpp, offset=0, len=0;
     bool flag=this->Sign==num.Sign;
     tmp.Sign=num.Sign=false;
 
     String str=this->Str();
+    if(str[0]=='-')str.Erase(str.begin());
     if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
+    len=0;
+    while(str[len]=='0')len++;
+    str.Erase(0, len);
     ui len1=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num1.PushBack(*p-48);
 
     str=num.Str();
+    if(str[0]=='-')str.Erase(str.begin());
     if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
+    len=0;
+    while(str[len]=='0')len++;
+    str.Erase(0, len);
     ui len2=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num2.PushBack(*p-48);
 
-    ui len=1, l=0;
+    len=1;
+    ui l=0;
     while(len<len1+len2)len<<=1, l++;
     num1.Resize(len), num2.Resize(len);
     NTTInit(len, l);
@@ -648,6 +664,7 @@ MyNumber MyNumber::operator*(MyNumber num){
     str.Clear();
     for(ui i=len-1;i<Lim;i--)
         str.PushBack(static_cast<char>(num2[i]+'0'));
+    while(offset+1>str.Size())str.Insert(str.begin(), '0');
     if(tmp.Offset+num.Offset>0)str.Insert(str.Size()-offset, '.');
     if(str.Front()=='.')str.Insert(str.begin(), '0');
     auto ptr=str.end()-1;
@@ -673,15 +690,34 @@ MyNumber MyNumber::operator/(ll num){
     return ans;
 }
 
+#include <iostream>
+
 MyNumber MyNumber::operator/(MyNumber num){
     assert(num!=0);
 
-    MyNumber x0("0.5"), x1=x0;
-    for(ui i=0;i<=10;i++)
-        x0*=(2-x0*num);
+    String InitialValue="0.";
+    for(ui i=1, len=num.Str().Size();i<len;i++)
+        InitialValue.PushBack('0');
+    InitialValue.PushBack('5');
 
-    MyNumber res1=(*this)*x0, res2=(*this)*(x0+1);
-    return (Abs(res1-num)<Abs(res2-num)?res1.Int():res2.Int());
+    MyNumber x0(InitialValue), x1=x0;
+    const ui LenLim=this->Str().Size();
+    for(ui i=0;i<20;i++){
+        x0*=(2-x0*num);
+        x0.KeepDecimals(LenLim+5);
+    }
+
+    String tmp1=this->Str();
+    if(tmp1.Back()>'4') {
+        // It can be guaranteed that x0 is always a decimal number
+        ui pos=tmp1.Size()-tmp1.Find('.')-1;
+        String tmp2="0.";
+        for(ui i=1;i<pos;i++)tmp2.PushBack('0');
+        //To do
+    }
+
+    MyNumber res=(*this)*x0;
+    return ((res*num).Int()==(*this))?res.Int():res.Int()+1;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){

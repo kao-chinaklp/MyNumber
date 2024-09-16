@@ -9,6 +9,7 @@ int main(){
     while(true){
         cin>>num1;
         cin>>num2;
+        num1.Str();
         auto res=num1/num2;
         cout<<res.Str()<<"\n";
     }

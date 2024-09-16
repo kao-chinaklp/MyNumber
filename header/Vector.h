@@ -430,6 +430,7 @@ void Vector<T>::Resize(ui size, const T& val){
     }
     Rstart=Finish-1;
     Rfinish=Start-1;
+    IsInit=false;
 }
 
 template<class T>
