@@ -327,7 +327,7 @@ typename Vector<T>::iterator Vector<T>::Insert(const ui pos, const T& val){
 }
 
 template<class T>
-typename Vector<T>::iterator Vector<T>::Insert(typename Vector<T>::iterator p, const T& val){
+typename Vector<T>::iterator Vector<T>::Insert(iterator p, const T& val){
     assert(p>=Start);
     assert(p<=Finish);
 
@@ -351,7 +351,7 @@ typename Vector<T>::iterator Vector<T>::Insert(typename Vector<T>::iterator p, c
 }
 
 template<class T>
-typename Vector<T>::iterator Vector<T>::Erase(typename Vector<T>::iterator p){
+typename Vector<T>::iterator Vector<T>::Erase(iterator p){
     assert(p>=Start);
     assert(p<Finish);
 

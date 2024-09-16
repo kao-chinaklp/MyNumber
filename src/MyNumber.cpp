@@ -298,61 +298,23 @@ const ui& MyNumber::operator[](const ui idx)const{
 }
 
 MyNumber MyNumber::operator++(){
-    if(this->Sign&&!this->jump){
-        this->jump=true;
-        return --(*this);
-    }
-
-    auto iter=this->Number.begin()+this->Offset;
-    auto End=this->Number.end();
-    ++(*iter);
-    while((++iter)!=End){
-        if(*(iter-1)<Lim)break;
-        ++(*iter);
-        *(iter-1)=0;
-    }
-    if(this->GetSize()>1&&iter==End||*(iter-1)==Lim){
-        (*iter)=0;
-        this->Number.PushBack(1);
-    }
-    this->jump=false;
-
-    return *this;
+    return *this+=1;
 }
 
 MyNumber MyNumber::operator++(int){
     MyNumber tmp(*this);
-    ++(*this);
+    *this+=1;
+
     return tmp;
 }
 
 MyNumber MyNumber::operator--(){
-    if(this->Sign&&!this->jump){
-        this->jump=true;
-        return ++(*this);
-    }
-
-    auto iter=this->Number.begin();
-    auto End=this->Number.end();
-    --(*iter);
-    while((++iter)!=End){
-        if(*(iter-1)<Lim)break;
-        --(*iter);
-        *(iter-1)=Lim-1;
-    }
-    this->RemoveLeadingZero();
-    if(this->GetSize()==1){
-        if(this->Sign&&*(iter)==0)this->Sign=false;
-        if(!this->Sign&&*(iter-1)>=Lim)this->Sign=true,*(iter-1)=1;
-    }
-    this->jump=false;
-
-    return (*this);
+    return *this+=1;
 }
 
 MyNumber MyNumber::operator--(int){
     MyNumber tmp(*this);
-    --(*this);
+    *this-=1;
 
     return tmp;
 }
@@ -440,7 +402,7 @@ bool MyNumber::operator<(const MyNumber& num){
     }
 
     if(!flag)return str1.Size()<str2.Size();
-    else return str1.Size()>str2.Size();
+    return str1.Size()>str2.Size();
 }
 
 bool MyNumber::operator>(ll num){
@@ -690,8 +652,6 @@ MyNumber MyNumber::operator/(ll num){
     return ans;
 }
 
-#include <iostream>
-
 MyNumber MyNumber::operator/(MyNumber num){
     assert(num!=0);
 
@@ -707,17 +667,8 @@ MyNumber MyNumber::operator/(MyNumber num){
         x0.KeepDecimals(LenLim+5);
     }
 
-    String tmp1=this->Str();
-    if(tmp1.Back()>'4') {
-        // It can be guaranteed that x0 is always a decimal number
-        ui pos=tmp1.Size()-tmp1.Find('.')-1;
-        String tmp2="0.";
-        for(ui i=1;i<pos;i++)tmp2.PushBack('0');
-        //To do
-    }
-
     MyNumber res=(*this)*x0;
-    return ((res*num).Int()==(*this))?res.Int():res.Int()+1;
+    return abs((res.Int()*num).Int()-*this)<abs((res+1).Int()*num-*this)?res.Int():res.Int()+1;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){

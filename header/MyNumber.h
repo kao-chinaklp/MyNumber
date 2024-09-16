@@ -92,7 +92,7 @@ class MyNumber{
         void RemoveBackZero();
         void Inverse(MyNumber& num, ui len);
         static MyNumber Abs(MyNumber num);
-        ll FastPow(ll num, ll idx);
+        static ll FastPow(ll num, ll idx);
         MyNumber Int();
 
     private:
