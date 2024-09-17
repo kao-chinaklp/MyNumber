@@ -1,17 +1,19 @@
 #include "MyNumber.h"
 
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
 int main(){
     MyNumber num1, num2;
+    auto t=clock();
     while(true){
         cin>>num1;
         cin>>num2;
-        num1.Str();
+        t=clock();
         auto res=num1/num2;
-        cout<<res.Str()<<"\n";
+        cerr<<res.Str()<<" costs: "<<clock()-t<<" ms"<<"\n";
     }
     return 0;
 }

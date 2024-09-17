@@ -538,31 +538,7 @@ MyNumber MyNumber::operator-(MyNumber num){
 }
 
 MyNumber MyNumber::operator*(ll num){
-    MyNumber ans=*this, in=*this;
-
-    if(num<0){
-        ans.Sign=!ans.Sign;
-        num=-num;
-    }
-
-    ull tmp;
-    for(ui i=ans.GetSize();i<Lim;i--){
-        tmp=1ull*ans[i]*num;
-        in[i]=tmp/Lim;
-        ans[i]=tmp%Lim;
-    }
-
-    tmp=0;
-    for(ui i=ans.GetSize()-1;i<Lim;i--){
-        tmp+=0ull*ans[i]+in[i+1];
-        ans[i]=tmp%Lim;
-        tmp/=Lim;
-    }
-
-    if(tmp!=0)ans.Number.PushBack(tmp);
-    ans.RemoveBackZero();
-
-    return ans;
+    return *this*MyNumber(num);
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
@@ -639,17 +615,7 @@ MyNumber MyNumber::operator*(MyNumber num){
 }
 
 MyNumber MyNumber::operator/(ll num){
-    MyNumber ans=0;
-    ll tmp=0, p=this->GetSize();
-    ans.GetNumber().Resize(p);
-    while(--p>=0){
-        tmp=tmp*Lim+(*this)[p];
-        ans[p]=tmp/num;
-        tmp%=num;
-    }
-    ans.RemoveLeadingZero();
-    ans.RemoveBackZero();
-    return ans;
+    return *this/MyNumber(num);
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
@@ -669,6 +635,14 @@ MyNumber MyNumber::operator/(MyNumber num){
 
     MyNumber res=(*this)*x0;
     return abs((res.Int()*num).Int()-*this)<abs((res+1).Int()*num-*this)?res.Int():res.Int()+1;
+}
+
+MyNumber MyNumber::operator%(ll num){
+    return *this-(*this/num)*num;
+}
+
+MyNumber MyNumber::operator%(MyNumber num){
+    return *this-(*this/num)*num;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
@@ -701,6 +675,14 @@ MyNumber MyNumber::operator/=(MyNumber num){
 
 MyNumber MyNumber::operator/=(ll num){
     return *this=*this/MyNumber(num);
+}
+
+MyNumber MyNumber::operator%=(MyNumber num){
+    return *this=*this%num;
+}
+
+MyNumber MyNumber::operator%=(ll num){
+    return *this=*this%MyNumber(num);
 }
 
 MyNumber MyNumber::operator<<(ll num){

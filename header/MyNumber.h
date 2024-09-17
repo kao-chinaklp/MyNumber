@@ -57,6 +57,8 @@ class MyNumber{
         MyNumber operator*(MyNumber num);
         MyNumber operator/(ll num);
         MyNumber operator/(MyNumber num);
+        MyNumber operator%(ll num);
+        MyNumber operator%(MyNumber num);
 
         MyNumber operator+=(ll num);
         MyNumber operator+=(MyNumber num);
@@ -66,6 +68,8 @@ class MyNumber{
         MyNumber operator*=(MyNumber num);
         MyNumber operator/=(ll num);
         MyNumber operator/=(MyNumber num);
+        MyNumber operator%=(ll num);
+        MyNumber operator%=(MyNumber num);
         friend MyNumber operator+=(ll& num1, MyNumber num2);
         friend MyNumber operator-=(ll& num1, MyNumber num2);
         friend MyNumber operator*=(ll& num1, MyNumber num2);
