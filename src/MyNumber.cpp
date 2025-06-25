@@ -38,7 +38,7 @@ MyNumber::MyNumber(String num){
     this->Offset=0;
 
     Vector<ui>& t_num=this->Number;
-    String integer, decimal;
+    String integer="", decimal="";
     ui point=num.Find("."), tmp=0, cnt=0;
     if(point==static_cast<ui>(-1))point=num.Size();
     else num.Erase(point);
@@ -47,7 +47,7 @@ MyNumber::MyNumber(String num){
     decimal=num.Substr(point, num.Size()-point);
 
     if(!decimal.Empty()){
-        for(char c:decimal){
+        for(const char c:decimal){
             tmp=tmp*10+c-'0';
             if(++cnt==9){
                 t_num.PushBack(tmp);
@@ -121,7 +121,7 @@ MyNumber& MyNumber::operator=(String num){
     this->Offset=0;
 
     Vector<ui>& t_num=this->Number;
-    String integer, decimal;
+    String integer="", decimal="";
     ui point=num.Find("."), tmp=0, cnt=0;
     if(point==static_cast<ui>(-1))point=num.Size();
     else num.Erase(point);
@@ -194,6 +194,13 @@ const Vector<ui> &MyNumber::GetNumber()const{
     return this->Number;
 }
 
+void MyNumber::KeepDecimals(ui len){
+    if(len>=this->Offset)return;
+    this->Number.Erase(0, this->Offset-len);
+    this->Offset=len;
+}
+
+
 void MyNumber::RemoveLeadingZero(){
     for(ui i=this->GetSize();i>this->Offset+1&&this->Number.Back()==0;i--)
         this->Number.PopBack();
@@ -235,17 +242,17 @@ void MyNumber::Inverse(MyNumber& num, const ui len){
 
 MyNumber MyNumber::Int(){
     MyNumber tmp(*this);
-    Number.Erase(0, Offset);
+    tmp.GetNumber().Erase(0, Offset);
     tmp.Offset=0;
     return tmp;
 }
 
 String MyNumber::Str(){
+    this->RemoveLeadingZero();
     String out;
     ui point=this->GetSize()-this->Offset;
     Vector<ui> num=this->Number;
 
-    this->RemoveLeadingZero();
     Reverse(num.begin(), num.end());
 
     for(int p=0;p<point;p++){
@@ -259,7 +266,7 @@ String MyNumber::Str(){
 
     for(ui p=point, len=this->GetSize();p<len;p++){
         String tmp=ToString(num[p]);
-        while(tmp.Size()<8)tmp.Insert(tmp.begin(), '0');
+        while(tmp.Size()<9)tmp.Insert(tmp.begin(), '0');
         out+=tmp;
     }
 
@@ -286,61 +293,23 @@ const ui& MyNumber::operator[](const ui idx)const{
 }
 
 MyNumber MyNumber::operator++(){
-    if(this->Sign&&!this->jump){
-        this->jump=true;
-        return --(*this);
-    }
-
-    auto iter=this->Number.begin()+this->Offset;
-    auto End=this->Number.end();
-    ++(*iter);
-    while((++iter)!=End){
-        if(*(iter-1)<Lim)break;
-        ++(*iter);
-        *(iter-1)=0;
-    }
-    if(this->GetSize()>1&&iter==End||*(iter-1)==Lim){
-        (*iter)=0;
-        this->Number.PushBack(1);
-    }
-    this->jump=false;
-
-    return *this;
+    return *this+=1;
 }
 
 MyNumber MyNumber::operator++(int){
     MyNumber tmp(*this);
-    ++(*this);
+    *this+=1;
+
     return tmp;
 }
 
 MyNumber MyNumber::operator--(){
-    if(this->Sign&&!this->jump){
-        this->jump=true;
-        return ++(*this);
-    }
-
-    auto iter=this->Number.begin();
-    auto End=this->Number.end();
-    --(*iter);
-    while((++iter)!=End){
-        if(*(iter-1)<Lim)break;
-        --(*iter);
-        *(iter-1)=Lim-1;
-    }
-    this->RemoveLeadingZero();
-    if(this->GetSize()==1){
-        if(this->Sign&&*(iter)==0)this->Sign=false;
-        if(!this->Sign&&*(iter-1)>=Lim)this->Sign=true,*(iter-1)=1;
-    }
-    this->jump=false;
-
-    return (*this);
+    return *this+=1;
 }
 
 MyNumber MyNumber::operator--(int){
     MyNumber tmp(*this);
-    --(*this);
+    *this-=1;
 
     return tmp;
 }
@@ -402,13 +371,21 @@ bool MyNumber::operator<(const MyNumber& num){
     // Determine the integer part
     bool offset1=num1.Find('.')!=static_cast<ui>(-1);
     bool offset2=num2.Find('.')!=static_cast<ui>(-1);
-    ui size1=num1.Size()-offset1, size2=num2.Size()-offset2;
+    ui _size=num1.Size()-offset1;
 
     if((offset1?num1.Find('.'):num1.Size())<(offset2?num2.Find('.'):num2.Size()))return !flag;
     if((offset1?num1.Find('.'):num1.Size())>(offset2?num2.Find('.'):num2.Size()))return flag;
-    for(ui i=0, len=size1-this->Offset;i<len;i++){
-        if(num1[i]<num2[i])return !flag;
-        if(num1[i]>num2[i])return flag;
+    if(offset1){
+        for(ui i=0, len=num1.Find('.');i<len;i++){
+            if(num1[i]<num2[i])return !flag;
+            if(num1[i]>num2[i])return flag;
+        }
+    }
+    else{
+        for(ui i=0, len=_size;i<len;i++){
+            if(num1[i]<num2[i])return !flag;
+            if(num1[i]>num2[i])return flag;
+        }
     }
 
     // Determine the decimal part
@@ -420,7 +397,7 @@ bool MyNumber::operator<(const MyNumber& num){
     }
 
     if(!flag)return str1.Size()<str2.Size();
-    else return str1.Size()>str2.Size();
+    return str1.Size()>str2.Size();
 }
 
 bool MyNumber::operator>(ll num){
@@ -442,13 +419,21 @@ bool MyNumber::operator>(const MyNumber& num){
     // Determine the integer part
     bool offset1=num1.Find('.')!=static_cast<ui>(-1);
     bool offset2=num2.Find('.')!=static_cast<ui>(-1);
-    ui size1=num1.Size()-offset1, size2=num2.Size()-offset2;
+    ui _size=num1.Size()-offset1;
 
     if((offset1?num1.Find('.'):num1.Size())>(offset2?num2.Find('.'):num2.Size()))return !flag;
     if((offset1?num1.Find('.'):num1.Size())<(offset2?num2.Find('.'):num2.Size()))return flag;
-    for(ui i=0, len=size1-this->Offset;i<len;i++){
-        if(num1[i]>num2[i])return !flag;
-        if(num1[i]<num2[i])return flag;
+    if(offset1){
+        for(ui i=0, len=num1.Find('.');i<len;i++){
+            if(num1[i]>num2[i])return !flag;
+            if(num1[i]<num2[i])return flag;
+        }
+    }
+    else{
+        for(ui i=0, len=_size;i<len;i++){
+            if(num1[i]>num2[i])return !flag;
+            if(num1[i]<num2[i])return flag;
+        }
     }
 
     // Determine the decimal part
@@ -548,31 +533,7 @@ MyNumber MyNumber::operator-(MyNumber num){
 }
 
 MyNumber MyNumber::operator*(ll num){
-    MyNumber ans=*this, in=*this;
-
-    if(num<0){
-        ans.Sign=!ans.Sign;
-        num=-num;
-    }
-
-    ull tmp;
-    for(ui i=ans.GetSize();i<Lim;i--){
-        tmp=1ull*ans[i]*num;
-        in[i]=tmp/Lim;
-        ans[i]=tmp%Lim;
-    }
-
-    tmp=0;
-    for(ui i=ans.GetSize()-1;i<Lim;i--){
-        tmp+=0ull*ans[i]+in[i+1];
-        ans[i]=tmp%Lim;
-        tmp/=Lim;
-    }
-
-    if(tmp!=0)ans.Number.PushBack(tmp);
-    ans.RemoveBackZero();
-
-    return ans;
+    return *this*MyNumber(num);
 }
 
 MyNumber MyNumber::operator*(MyNumber num){
@@ -580,23 +541,32 @@ MyNumber MyNumber::operator*(MyNumber num){
 
     MyNumber tmp(*this);
     Vector<ui> num1, num2;
-    ui tmpp, offset=0;
+    ui tmpp, offset=0, len=0;
     bool flag=this->Sign==num.Sign;
     tmp.Sign=num.Sign=false;
 
     String str=this->Str();
+    if(str[0]=='-')str.Erase(str.begin());
     if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
+    len=0;
+    while(str[len]=='0')len++;
+    str.Erase(0, len);
     ui len1=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num1.PushBack(*p-48);
 
     str=num.Str();
+    if(str[0]=='-')str.Erase(str.begin());
     if((tmpp=str.Find('.'))!=static_cast<ui>(-1))str.Erase(tmpp), offset+=str.Size()-tmpp;
+    len=0;
+    while(str[len]=='0')len++;
+    str.Erase(0, len);
     ui len2=str.Size();
     for(Vector<char>::reverseIterator p=str.rbegin();p!=str.rend();++p)
         num2.PushBack(*p-48);
 
-    ui len=1, l=0;
+    len=1;
+    ui l=0;
     while(len<len1+len2)len<<=1, l++;
     num1.Resize(len), num2.Resize(len);
     NTTInit(len, l);
@@ -627,10 +597,11 @@ MyNumber MyNumber::operator*(MyNumber num){
     str.Clear();
     for(ui i=len-1;i<Lim;i--)
         str.PushBack(static_cast<char>(num2[i]+'0'));
+    while(offset+1>str.Size())str.Insert(str.begin(), '0');
     if(tmp.Offset+num.Offset>0)str.Insert(str.Size()-offset, '.');
     if(str.Front()=='.')str.Insert(str.begin(), '0');
     auto ptr=str.end()-1;
-    while(ptr!=str.begin()+1&&*ptr=='0'){
+    while(str.Size()>1&&*ptr=='0'){
         str.PopBack(), ptr--;
         if(*ptr=='.')break;
     }
@@ -639,33 +610,34 @@ MyNumber MyNumber::operator*(MyNumber num){
 }
 
 MyNumber MyNumber::operator/(ll num){
-    MyNumber ans=0;
-    ll tmp=0, p=this->GetSize();
-    ans.GetNumber().Resize(p);
-    while(--p>=0){
-        tmp=tmp*Lim+(*this)[p];
-        ans[p]=tmp/num;
-        tmp%=num;
-    }
-    ans.RemoveLeadingZero();
-    ans.RemoveBackZero();
-    return ans;
+    return *this/MyNumber(num);
 }
 
 MyNumber MyNumber::operator/(MyNumber num){
     assert(num!=0);
 
-    MyNumber x0("0.5"), x1=x0;
-    String str=x0.Str();
-    while(true) {
-        str=((2-x0*num)*x0).Str();
-        x0=x0*(2-x0*num);
-        if(x0.Int()==x1.Int())break;
-        x1=x0;
+    String InitialValue="0.";
+    for(ui i=1, len=num.Str().Size();i<len;i++)
+        InitialValue.PushBack('0');
+    InitialValue.PushBack('5');
+
+    MyNumber x0(InitialValue), x1=x0;
+    const ui LenLim=this->Str().Size();
+    for(ui i=0;i<20;i++){
+        x0*=(2-x0*num);
+        x0.KeepDecimals(LenLim+5);
     }
 
-    if(abs((*this)-(*this)*x0)<abs((*this)-(*this)*(x0+1)))return *this*x0;
-    return *this*(x0+1);
+    MyNumber res=(*this)*x0;
+    return abs((res.Int()*num).Int()-*this)<abs((res+1).Int()*num-*this)?res.Int():res.Int()+1;
+}
+
+MyNumber MyNumber::operator%(ll num){
+    return *this-(*this/num)*num;
+}
+
+MyNumber MyNumber::operator%(MyNumber num){
+    return *this-(*this/num)*num;
 }
 
 MyNumber MyNumber::operator+=(MyNumber num){
@@ -698,6 +670,14 @@ MyNumber MyNumber::operator/=(MyNumber num){
 
 MyNumber MyNumber::operator/=(ll num){
     return *this=*this/MyNumber(num);
+}
+
+MyNumber MyNumber::operator%=(MyNumber num){
+    return *this=*this%num;
+}
+
+MyNumber MyNumber::operator%=(ll num){
+    return *this=*this%MyNumber(num);
 }
 
 MyNumber MyNumber::operator<<(ll num){
@@ -733,6 +713,23 @@ MyNumber MyNumber::operator<<=(ll num){
 
 MyNumber MyNumber::operator>>=(ll num){
     return *this=(*this)>>num;
+}
+
+MyNumber MyNumber::Derivative(){
+    MyNumber tmp(*this);
+    for(ui i=0, len=tmp.GetSize()-1;i<len;i++)
+        tmp[i]=1ll*tmp[i+1]*(i+1)%mod;
+    tmp.GetNumber().PopBack();
+    return tmp;
+}
+
+MyNumber MyNumber::Integral(){
+    MyNumber tmp(*this);
+    tmp.GetNumber().PushBack(0);
+    for(ui i=tmp.GetSize()-1;i>0;i--)
+        tmp[i]=tmp[i-1]*FastPow(i, mod-2)%mod;
+    tmp[0]=0;
+    return tmp;
 }
 
 ll MyNumber::FastPow(ll num, ll idx){
@@ -819,7 +816,18 @@ std::ostream& operator<<(std::ostream& o, const MyNumber& num){
     return o;
 }
 
-MyNumber abs(MyNumber num){
+MyNumber Abs(MyNumber num){
     num.Sign=false;
     return num;
+}
+
+MyNumber Pow(MyNumber num, MyNumber idx){
+    MyNumber ans(1);
+    while(idx!=0){
+        if(idx[0]&1)ans*=num, --idx;
+        idx/=2;
+        num*=num;
+    }
+
+    return ans;
 }

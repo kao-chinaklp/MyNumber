@@ -57,6 +57,8 @@ class MyNumber{
         MyNumber operator*(MyNumber num);
         MyNumber operator/(ll num);
         MyNumber operator/(MyNumber num);
+        MyNumber operator%(ll num);
+        MyNumber operator%(MyNumber num);
 
         MyNumber operator+=(ll num);
         MyNumber operator+=(MyNumber num);
@@ -66,6 +68,8 @@ class MyNumber{
         MyNumber operator*=(MyNumber num);
         MyNumber operator/=(ll num);
         MyNumber operator/=(MyNumber num);
+        MyNumber operator%=(ll num);
+        MyNumber operator%=(MyNumber num);
         friend MyNumber operator+=(ll& num1, MyNumber num2);
         friend MyNumber operator-=(ll& num1, MyNumber num2);
         friend MyNumber operator*=(ll& num1, MyNumber num2);
@@ -74,6 +78,10 @@ class MyNumber{
         friend std::istream& operator>>(std::istream& i, MyNumber& num);
         friend std::ostream& operator<<(std::ostream& o, const MyNumber& num);
 
+        friend MyNumber Abs(MyNumber num);
+
+        friend MyNumber Pow(MyNumber num, MyNumber idx);
+
     protected:
         explicit MyNumber(String num);
         MyNumber& operator=(String num);
@@ -81,13 +89,20 @@ class MyNumber{
         MyNumber operator>>(ll num);
         MyNumber operator<<=(ll num);
         MyNumber operator>>=(ll num);
+
+        MyNumber Derivative();
+        MyNumber Integral();
+
         [[nodiscard]] ui GetSize()const;
         void SetSize(ui new_size);
         Vector<ui>& GetNumber();
         [[nodiscard]] const Vector<ui>& GetNumber()const;
+
+        void KeepDecimals(ui len);
         void RemoveLeadingZero();
         void RemoveBackZero();
         void Inverse(MyNumber& num, ui len);
+        static ll FastPow(ll num, ll idx);
         MyNumber Int();
 
     private:
@@ -96,7 +111,6 @@ class MyNumber{
         ui Offset; // 0 - Offset is decimal part, Offset - size is integer part
         Vector<ui> Number;
         Vector<ui> rev;
-        static ll FastPow(ll num, ll idx);
         void NTTInit(ui len, ui size);
         void NTT(Vector<ui>& arr, ui n, int inv);
 };
@@ -113,6 +127,9 @@ MyNumber operator/=(ll& num1, MyNumber num2);
 std::istream& operator>>(std::istream& i, MyNumber& num);
 std::ostream& operator<<(std::ostream& o, const MyNumber& num);
 
-MyNumber abs(MyNumber num);
+MyNumber Abs(MyNumber num);
+
+MyNumber Pow(MyNumber num, MyNumber idx);
+MyNumber Exp(MyNumber idx);
 
 #endif

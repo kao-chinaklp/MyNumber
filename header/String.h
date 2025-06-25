@@ -13,7 +13,7 @@ class String{
         String():String(""){};
         String(const char* init);
         String(const String& init);
-        String(String&& init) noexcept ;
+        String(String&& init)noexcept;
         String(iterator _start, iterator _end);
         ~String();
 
