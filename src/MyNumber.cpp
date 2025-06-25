@@ -629,7 +629,7 @@ MyNumber MyNumber::operator/(MyNumber num){
     }
 
     MyNumber res=(*this)*x0;
-    return abs((res.Int()*num).Int()-*this)<abs((res+1).Int()*num-*this)?res.Int():res.Int()+1;
+    return Abs((res.Int()*num).Int()-*this)<Abs((res+1).Int()*num-*this)?res.Int():res.Int()+1;
 }
 
 MyNumber MyNumber::operator%(ll num){
